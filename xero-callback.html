@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AFR Moves — Xero Auth</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #0f1117; color: #e8eaf2; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; flex-direction: column; gap: 12px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid #333; border-top-color: #0db465; border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  p { font-size: 14px; color: #8b91a8; }
+</style>
+</head>
+<body>
+<div class="spinner"></div>
+<p>Completing Xero login — closing window…</p>
+<script>
+// This page receives the Xero OAuth2 callback, extracts the code,
+// passes it back to the CRM opener window, then closes itself.
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const code  = params.get('code');
+  const state = params.get('state');
+  const error = params.get('error');
+
+  if (window.opener && !window.opener.closed) {
+    window.opener.postMessage(
+      { type: 'XERO_CALLBACK', code, state, error },
+      'https://africanfurnitureremovals.co.za'
+    );
+  }
+  // Close after a brief delay so the message is received
+  setTimeout(() => window.close(), 800);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFR Moves CRM</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f1117;--surface:#181c27;--surface2:#1e2333;--surface3:#252b3d;
+  --border:#2a3048;--border2:#333d5c;--text:#e8eaf2;--text2:#8b91a8;--text3:#555d7a;
+  --accent:#4f7cff;--accent2:#3563e9;--green:#22c55e;--yellow:#f59e0b;
+  --red:#ef4444;--orange:#f97316;--purple:#a855f7;--teal:#14b8a6;
+  --radius:10px;--radius-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* NAV */
+.topnav{display:flex;align-items:center;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--border);height:50px;flex-shrink:0;gap:6px;}
+.logo{font-size:14px;font-weight:600;margin-right:16px;letter-spacing:.5px;white-space:nowrap;}
+.logo span{color:var(--accent);}
+.nav-tabs{display:flex;gap:2px;}
+.nav-tab{padding:5px 12px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;}
+.nav-tab:hover{color:var(--text);background:var(--surface3);}
+.nav-tab.active{color:var(--text);background:var(--surface3);}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-left:10px;}
+.search-input{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px 5px 30px;font-size:12.5px;color:var(--text);width:220px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .15s;}
+.search-input:focus{border-color:var(--accent);width:280px;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;pointer-events:none;}
+.search-results{position:absolute;top:calc(100% + 6px);left:0;width:340px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:200;display:none;max-height:400px;overflow-y:auto;}
+.search-results.open{display:block;}
+.search-group-label{padding:6px 12px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);border-bottom:1px solid var(--border);}
+.search-item{padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s;}
+.search-item:hover{background:var(--surface2);}
+.search-item-name{font-size:13px;font-weight:500;color:var(--text);}
+.search-item-meta{font-size:11px;color:var(--text3);margin-top:1px;}
+
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.add-btn{background:var(--accent);color:white;border:none;padding:6px 12px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;}
+.add-btn:hover{background:var(--accent2);}
+
+/* ALERT BANNER */
+.alert-banner{background:linear-gradient(90deg,#1a2040,#1e2a50);border-bottom:1px solid #2d3f7a;padding:7px 16px;display:flex;align-items:center;gap:8px;font-size:12px;color:#a0b0e8;flex-shrink:0;flex-wrap:wrap;}
+.alert-icon{color:#f59e0b;}
+.alert-call{background:#253060;border:1px solid #3a4d8a;border-radius:20px;padding:3px 10px 3px 8px;font-size:11.5px;color:#c0ccf0;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s;}
+.alert-call:hover{background:#2e3d80;}
+.alert-call-dismiss{background:#1a2550;border:1px solid #3a4d8a;border-radius:50%;width:16px;height:16px;font-size:10px;color:#8090c0;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.alert-call-dismiss:hover{background:#ef4444;color:white;border-color:#ef4444;}
+
+/* PIPELINE BAR */
+.pipeline-bar{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+.pipeline-btn{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);transition:all .15s;}
+.pipeline-btn:hover{border-color:var(--accent);color:var(--text);}
+.pipeline-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.view-toggle{display:flex;gap:4px;margin-left:auto;}
+.view-btn{padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;font-size:12px;transition:all .15s;}
+.view-btn.active{background:var(--surface3);color:var(--text);border-color:var(--border2);}
+
+/* BOARD */
+.board{display:flex;gap:9px;padding:12px 16px;overflow-x:auto;overflow-y:hidden;flex:1;align-items:flex-start;}
+.board::-webkit-scrollbar{height:5px;}
+.board::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* COLUMN */
+.col{min-width:218px;max-width:218px;display:flex;flex-direction:column;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);max-height:100%;}
+.col.col-won{opacity:.5;transition:opacity .2s;}
+.col.col-won:hover,.col.col-lost:hover{opacity:1;}
+.col.col-lost{opacity:.5;transition:opacity .2s;}
+.col-head{padding:9px 10px 7px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.col-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.col-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);}
+.col-count{background:var(--surface3);border-radius:20px;padding:1px 6px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;}
+.col-value{font-size:10.5px;color:var(--text3);font-family:'DM Mono',monospace;}
+.col-stripe{height:2px;border-radius:1px;margin-top:5px;}
+.col-cards{overflow-y:auto;padding:7px;display:flex;flex-direction:column;gap:5px;flex:1;}
+.col-cards::-webkit-scrollbar{width:3px;}
+.col-cards::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.col-expand-btn{padding:6px;text-align:center;font-size:11px;color:var(--text3);cursor:pointer;border-top:1px solid var(--border);}
+.col-expand-btn:hover{color:var(--text2);}
+
+/* CARD */
+.card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px;cursor:pointer;transition:all .15s;position:relative;}
+.card:hover{border-color:var(--accent);background:var(--surface3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
+.card-company{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:2px;}
+.card-name{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:5px;padding-right:12px;line-height:1.3;}
+.card-meta{display:flex;flex-direction:column;gap:3px;}
+.card-row{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);}
+.card-row .icon{color:var(--text3);font-size:10px;width:11px;}
+.card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;}
+.tag{font-size:10px;padding:2px 6px;border-radius:10px;font-weight:500;}
+.tag-paid{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25);}
+.tag-deposit{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25);}
+.tag-unpaid{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25);}
+.tag-shuttle{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.25);}
+.tag-source{background:rgba(79,124,255,.12);color:#7ba4ff;border:1px solid rgba(79,124,255,.2);}
+.tag-label-current{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25);}
+.tag-label-next{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25);}
+.tag-label-later{background:rgba(79,124,255,.15);color:#7ba4ff;border:1px solid rgba(79,124,255,.2);}
+
+/* BREADCRUMB on hover */
+.card-breadcrumb{display:none;position:absolute;top:-36px;left:0;right:0;background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;z-index:10;white-space:nowrap;overflow:hidden;}
+.card:hover .card-breadcrumb{display:flex;gap:0;align-items:center;}
+.bc-step{font-size:9px;color:var(--text3);padding:0 3px;}
+.bc-step.current{color:var(--accent);font-weight:600;}
+.bc-sep{font-size:8px;color:var(--text3);}
+
+/* STAGE PROGRESS BAR (modal) */
+.stage-progress{display:flex;align-items:stretch;overflow:hidden;border-radius:6px;border:1px solid var(--border);margin-bottom:14px;flex-wrap:nowrap;}
+.sp-step{flex:1;padding:6px 4px;text-align:center;font-size:9.5px;font-weight:500;color:var(--text3);cursor:pointer;position:relative;background:var(--surface2);border-right:1px solid var(--border);transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+.sp-step:last-child{border-right:none;}
+.sp-step:hover{background:var(--surface3);color:var(--text2);}
+.sp-step.done{background:rgba(34,197,94,.1);color:#4ade80;}
+.sp-step.current{background:var(--accent);color:white;font-weight:600;}
+.sp-step.won-step{background:rgba(34,197,94,.15);color:#4ade80;}
+.sp-step.lost-step{background:rgba(239,68,68,.15);color:#f87171;}
+.sp-step.won-step.current{background:#16a34a;color:white;}
+.sp-step.lost-step.current{background:#dc2626;color:white;}
+.stage-dropdown{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;}
+.stage-dropdown:focus{border-color:var(--accent);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:720px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6);display:flex;flex-direction:column;}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;}
+.modal-title-area{flex:1;}
+.modal-company-input{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);background:none;border:none;outline:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
+.modal-company-input::placeholder{color:var(--text3);text-transform:none;font-weight:400;}
+.modal-title-input{font-size:17px;font-weight:600;background:none;border:none;outline:none;color:var(--text);width:100%;font-family:'DM Sans',sans-serif;}
+.modal-title-input::placeholder{color:var(--text3);}
+.modal-subtitle{font-size:11px;color:var(--text3);margin-top:3px;}
+.modal-header-actions{display:flex;align-items:center;gap:6px;margin-left:12px;}
+.xero-btn{background:rgba(13,180,101,.15);border:1px solid rgba(13,180,101,.35);color:#0db465;padding:5px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;}
+.xero-btn:hover{background:rgba(13,180,101,.25);}
+.xero-btn.linked{background:rgba(13,180,101,.2);border-color:#0db465;}
+.modal-close{background:var(--surface3);border:none;color:var(--text2);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:var(--border2);color:var(--text);}
+.modal-body{padding:18px 22px;flex:1;}
+.modal-section{margin-bottom:18px;}
+.modal-section-title{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.modal-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.field{display:flex;flex-direction:column;gap:3px;}
+.field-label{font-size:11px;color:var(--text3);font-weight:500;}
+.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 9px;font-size:12.5px;color:var(--text);font-family:'DM Sans',sans-serif;transition:border-color .15s;outline:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field textarea{resize:vertical;min-height:68px;}
+.field select option{background:var(--surface2);}
+.field-full{grid-column:1/-1;}
+.field-note{font-size:10px;color:var(--text3);margin-top:2px;}
+.add-more-link{font-size:11px;color:var(--accent);cursor:pointer;margin-top:4px;display:inline-block;}
+.add-more-link:hover{color:var(--text2);}
+.extra-contact-fields{display:none;margin-top:8px;}
+.char-count{font-size:10px;color:var(--text3);text-align:right;margin-top:2px;}
+
+/* PAYMENT */
+.payment-selector{display:flex;gap:5px;}
+.payment-opt{flex:1;padding:7px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .15s;}
+.payment-opt.active-paid{background:rgba(34,197,94,.15);border-color:#22c55e;color:#4ade80;}
+.payment-opt.active-deposit{background:rgba(245,158,11,.15);border-color:#f59e0b;color:#fbbf24;}
+.payment-opt.active-unpaid{background:rgba(239,68,68,.15);border-color:#ef4444;color:#f87171;}
+
+/* TOGGLES */
+.toggle-row{display:flex;gap:6px;flex-wrap:wrap;}
+.toggle-opt{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;}
+.toggle-opt:hover{border-color:var(--border2);color:var(--text);}
+.toggle-opt.active{background:rgba(79,124,255,.15);border-color:var(--accent);color:#7ba4ff;}
+
+/* SHUTTLE SECTION */
+.shuttle-section{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-top:6px;}
+.shuttle-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px;}
+
+/* FLAGS */
+.flag-row{display:flex;gap:6px;flex-wrap:wrap;}
+.flag-opt{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11.5px;cursor:pointer;transition:all .15s;}
+.flag-opt:hover{border-color:var(--border2);}
+.flag-opt.active{background:rgba(34,197,94,.12);border-color:#22c55e;color:#4ade80;}
+
+/* FILES */
+.file-item{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 9px;font-size:12px;color:var(--text2);margin-bottom:5px;}
+.file-item a{color:var(--accent);text-decoration:none;flex:1;}
+
+/* MODAL FOOTER */
+.modal-footer{padding:12px 22px;border-top:1px solid var(--border);display:flex;gap:7px;justify-content:flex-end;position:sticky;bottom:0;background:var(--surface);}
+.btn{padding:7px 16px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s;border:none;font-family:'DM Sans',sans-serif;}
+.btn-primary{background:var(--accent);color:white;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-secondary{background:var(--surface3);color:var(--text2);border:1px solid var(--border);}
+.btn-secondary:hover{color:var(--text);border-color:var(--border2);}
+.btn-danger{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25);}
+.btn-danger:hover{background:rgba(239,68,68,.22);}
+.btn-print{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.25);}
+.btn-print:hover{background:rgba(34,197,94,.22);}
+.btn-review{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.25);}
+.btn-review:hover{background:rgba(245,158,11,.22);}
+
+/* LEADS */
+.leads-view{flex:1;overflow-y:auto;padding:14px 16px;}
+.leads-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.leads-table th{text-align:left;padding:7px 10px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border-bottom:1px solid var(--border);cursor:pointer;}
+.leads-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle;}
+.leads-table tr:hover td{background:var(--surface2);}
+.next-today{color:#4ade80;font-weight:500;}
+.next-tomorrow{color:var(--text2);}
+.next-overdue{color:#f87171;font-weight:500;}
+.qualify-btn{background:rgba(79,124,255,.15);border:1px solid rgba(79,124,255,.3);color:#7ba4ff;padding:3px 9px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.qualify-btn:hover{background:rgba(79,124,255,.25);}
+.lose-lead-btn{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#f87171;padding:3px 9px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.lose-lead-btn:hover{background:rgba(239,68,68,.22);}
+
+/* LIST VIEW */
+.list-table{width:100%;border-collapse:collapse;font-size:12px;}
+.list-table th{text-align:left;padding:7px 9px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;}
+.list-table td{padding:7px 9px;border-bottom:1px solid var(--border);color:var(--text2);white-space:nowrap;}
+.list-table tr:hover td{background:var(--surface2);cursor:pointer;}
+.list-table td:first-child{font-family:'DM Mono',monospace;}
+.list-table td.client-col{color:var(--text);font-weight:600;font-family:'DM Sans',sans-serif;}
+
+/* WON/LOST collapsed */
+.won-lost-section{border-top:1px solid var(--border);padding:5px 7px;}
+.wl-header{display:flex;align-items:center;justify-content:space-between;padding:4px 3px;cursor:pointer;font-size:11px;color:var(--text3);}
+.wl-header:hover{color:var(--text2);}
+.wl-cards{display:none;max-height:300px;overflow-y:auto;margin-top:4px;}
+.wl-cards.open{display:block;}
+.wl-month-group{margin-bottom:8px;}
+.wl-month-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:3px 0;border-bottom:1px solid var(--border);margin-bottom:4px;}
+
+/* REVIEW CARD STYLE */
+.col-review .col-stripe{background:#f59e0b;}
+.col-review .col-title{color:#fbbf24;}
+
+/* PRINT */
+.print-sheet{display:none;padding:28px;font-family:Arial,sans-serif;color:#000;background:white;}
+@media print{body>*:not(#printArea){display:none!important;}#printArea{display:block!important;}}
+
+/* SCROLLBARS */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+.drag-over .col-cards{background:rgba(79,124,255,.07);border-radius:6px;}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="logo">AFR <span>MOVES</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab" onclick="showView('leads',this)">Leads</button>
+    <button class="nav-tab active" onclick="showView('pipeline',this)">Pipeline</button>
+    <button class="nav-tab" onclick="showView('listview',this)">List View</button>
+  </div>
+  <div class="search-wrap" style="margin-left:12px;">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" placeholder="Search all leads & deals..." id="searchInput" oninput="doSearch(this.value)" onblur="setTimeout(()=>closeSearch(),200)">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <div class="nav-right">
+    <button class="add-btn" onclick="openNewDeal()">+ New Deal</button>
+  </div>
+</div>
+
+<!-- 3PM CALL BANNER -->
+<div class="alert-banner" id="alertBanner">
+  <span class="alert-icon">🔔</span>
+  <strong style="color:#e8eaf2;white-space:nowrap;">3PM Calls — Zané:</strong>
+  <div id="callList" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  <button onclick="document.getElementById('alertBanner').style.display='none'" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;">×</button>
+</div>
+
+<!-- PIPELINE BAR -->
+<div class="pipeline-bar" id="pipelineBar">
+  <button class="pipeline-btn active" id="preBt" onclick="switchPipeline('pre',this)">Pre-Booking</button>
+  <button class="pipeline-btn" id="postBt" onclick="switchPipeline('post',this)">Post-Booking</button>
+  <span style="font-size:11px;color:var(--text3);margin-left:6px;" id="pipeTotal"></span>
+  <div class="view-toggle">
+    <button class="view-btn active" id="boardBtn" onclick="setBoardView('board')">⊞ Board</button>
+    <button class="view-btn" id="listBtn" onclick="setBoardView('list')">≡ List</button>
+  </div>
+</div>
+
+<!-- LEADS VIEW -->
+<div id="leadsView" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
+  <div style="padding:10px 16px 0;display:flex;align-items:center;gap:8px;">
+    <span style="font-size:12px;color:var(--text3)" id="leadsCount"></span>
+    <button class="add-btn" style="margin-left:auto;" onclick="openNewLead()">+ Lead</button>
+  </div>
+  <div class="leads-view"><table class="leads-table"><thead><tr>
+    <th>Name</th><th>Label</th><th>Phone</th><th>From</th><th>To</th><th>Source</th><th>Next Activity</th><th>Actions</th>
+  </tr></thead><tbody id="leadsBody"></tbody></table></div>
+</div>
+
+<!-- BOARD VIEW -->
+<div id="boardView" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+  <div class="board" id="board"></div>
+</div>
+
+<!-- LIST VIEW -->
+<div id="listViewEl" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
+  <div style="flex:1;overflow:auto;padding:12px 16px;">
+    <table class="list-table"><thead><tr>
+      <th>QUO</th><th>INV</th><th>Client</th><th>Transporter</th>
+      <th>Move Date</th><th>Delivery</th><th>Stage</th><th>Payment</th>
+      <th>Value</th><th>Cost</th><th>Profit</th><th>Source</th>
+    </tr></thead><tbody id="listBody"></tbody></table>
+  </div>
+</div>
+
+<!-- ADD PARTNER MODAL -->
+<div class="modal-overlay" id="partnerModalOverlay" style="z-index:300;" onclick="if(event.target===this){event.stopPropagation();closePartnerModal()}">
+<div class="modal" style="max-width:400px;">
+  <div class="modal-header">
+    <div class="modal-title-area">
+      <div class="modal-title">Moving Partners</div>
+      <div class="modal-subtitle">Add to your transporter dropdown</div>
+    </div>
+    <button class="modal-close" onclick="closePartnerModal()">×</button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-section">
+      <div class="modal-section-title">Add New Partner</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="newPartnerName" placeholder="Partner / transporter name..." onkeydown="if(event.key==='Enter')addPartner()" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;">
+        <button class="btn btn-primary" onclick="addPartner()" style="white-space:nowrap;">+ Add</button>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Current Partners</div>
+      <div id="partnerList"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- LEAD MODAL -->
+<div class="modal-overlay" id="leadModalOverlay" onclick="if(event.target===this)closeLeadModal()">
+<div class="modal" style="max-width:500px;">
+  <div class="modal-header">
+    <div class="modal-title-area">
+      <div class="modal-title" id="leadModalTitle">New Lead</div>
+    </div>
+    <button class="modal-close" onclick="closeLeadModal()">×</button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-section">
+      <div class="modal-section-title">Lead Info</div>
+      <div class="field-grid">
+        <div class="field field-full"><div class="field-label">Full Name</div><input type="text" id="lf_name" placeholder="Client name"></div>
+        <div class="field"><div class="field-label">Phone</div><input type="tel" id="lf_phone" placeholder="0xx xxx xxxx"></div>
+        <div class="field"><div class="field-label">Source</div>
+          <select id="lf_source">
+            <option value="">Select...</option>
+            <option>Moving24</option><option>Net4ce</option><option>Tri-Global</option>
+            <option>Whatsapp</option><option>Email</option><option>Repeat Customer</option><option>Website</option>
+          </select>
+        </div>
+        <div class="field field-full"><div class="field-label">Moving From</div><input type="text" id="lf_from" placeholder="City or address"></div>
+        <div class="field field-full"><div class="field-label">Moving To</div><input type="text" id="lf_to" placeholder="City or address"></div>
+        <div class="field"><div class="field-label">Label</div>
+          <select id="lf_label">
+            <option value="">None</option>
+            <option>CURRENT</option><option>NEXT</option><option>LATER</option>
+          </select>
+        </div>
+        <div class="field"><div class="field-label">Next Activity</div>
+          <select id="lf_activity">
+            <option>Today</option><option>Tomorrow</option><option>No activity</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-danger" id="leadDeleteBtn" onclick="deleteLead()" style="display:none;">Delete</button>
+    <button class="btn btn-secondary" onclick="closeLeadModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveLead()">Save Lead</button>
+  </div>
+</div>
+</div>
+
+<!-- DEAL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+<div class="modal" id="modal">
+
+  <!-- HEADER -->
+  <div class="modal-header">
+    <div class="modal-title-area">
+      <input class="modal-company-input" id="f_company" type="text" placeholder="Company name (optional)">
+      <input class="modal-title-input" id="f_name" type="text" placeholder="Client name">
+      <div class="modal-subtitle" id="modalSubtitle"></div>
+    </div>
+    <div class="modal-header-actions">
+      <button class="xero-btn" id="xeroBtn" onclick="syncXero()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#0db465"><circle cx="12" cy="12" r="10"/><text x="6" y="16" font-size="12" fill="white" font-family="Arial" font-weight="bold">X</text></svg>
+        Sync to Xero
+      </button>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+  </div>
+
+  <div class="modal-body">
+
+    <!-- STAGE PROGRESS -->
+    <div class="modal-section">
+      <div class="modal-section-title">Pipeline Stage</div>
+      <select class="stage-dropdown" id="stageDropdown" onchange="stageDropdownChange(this.value)"></select>
+      <div class="stage-progress" id="stageProgress"></div>
+    </div>
+
+    <!-- CLIENT INFO -->
+    <div class="modal-section">
+      <div class="modal-section-title">Client Info</div>
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">Contact Person (if company)</div>
+          <input type="text" id="f_contact_person" placeholder="Name at company">
+        </div>
+        <div class="field">
+          <div class="field-label">Source Channel</div>
+          <select id="f_source">
+            <option value="">Select...</option>
+            <option>Moving24</option><option>Net4ce</option><option>Tri-Global</option>
+            <option>Whatsapp</option><option>Email</option><option>Repeat Customer</option><option>Website</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label">Phone 1</div>
+          <input type="tel" id="f_phone" placeholder="0xx xxx xxxx">
+        </div>
+        <div class="field">
+          <div class="field-label">Email 1</div>
+          <input type="email" id="f_email" placeholder="email@example.com">
+        </div>
+      </div>
+      <span class="add-more-link" onclick="toggleExtraContact()">+ Add phone 2 / email 2</span>
+      <div class="extra-contact-fields" id="extraContactFields">
+        <div class="field-grid" style="margin-top:8px;">
+          <div class="field"><div class="field-label">Phone 2</div><input type="tel" id="f_phone2" placeholder="0xx xxx xxxx"></div>
+          <div class="field"><div class="field-label">Email 2</div><input type="email" id="f_email2" placeholder="email@example.com"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADDRESSES -->
+    <div class="modal-section">
+      <div class="modal-section-title">Addresses</div>
+      <div class="field-grid">
+        <div class="field field-full">
+          <div class="field-label">Moving From (Full Address)</div>
+          <input type="text" id="f_from" placeholder="Street, Suburb, City">
+        </div>
+        <div class="field field-full" id="shuttleFromWrap" style="display:none;">
+          <div class="shuttle-section">
+            <div class="shuttle-section-title">🚐 Shuttle at collection address (FROM)</div>
+            <div class="field-grid">
+              <div class="field">
+                <div class="field-label">Provider name</div>
+                <input type="text" id="f_shuttle_from_who" placeholder="e.g. Pierre, Jippie Vervoer…">
+              </div>
+              <div class="field">
+                <div class="field-label">Notes (capacity, city, etc.)</div>
+                <input type="text" id="f_shuttle_from_note" placeholder="e.g. 8ton, Pretoria">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field field-full">
+          <div class="field-label">Moving To (Full Address)</div>
+          <input type="text" id="f_to" placeholder="Street, Suburb, City">
+        </div>
+        <div class="field field-full" id="shuttleToWrap" style="display:none;">
+          <div class="shuttle-section">
+            <div class="shuttle-section-title">🚐 Shuttle at delivery address (TO)</div>
+            <div class="field-grid">
+              <div class="field">
+                <div class="field-label">Provider name</div>
+                <input type="text" id="f_shuttle_to_who" placeholder="e.g. Intertrans, TAC…">
+              </div>
+              <div class="field">
+                <div class="field-label">Notes (capacity, city, etc.)</div>
+                <input type="text" id="f_shuttle_to_note" placeholder="e.g. 4ton, Durban">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOB DETAILS -->
+    <div class="modal-section">
+      <div class="modal-section-title">Job Details</div>
+      <div class="field-grid">
+        <div class="field"><div class="field-label">QUO Ref</div><input type="text" id="f_quo" placeholder="8xxx"></div>
+        <div class="field"><div class="field-label">INV Ref</div><input type="text" id="f_inv" placeholder="46xx"></div>
+        <div class="field">
+          <div class="field-label">Transporter / Moving Partner</div>
+          <div style="display:flex;gap:5px;align-items:center;">
+            <select id="f_transporter" style="flex:1;" onchange="transporterSelectChange(this.value)">
+              <option value="">Select...</option>
+              <option value="__own__">🚛 Own Truck / Driver</option>
+              <option disabled>──────────────</option>
+            </select>
+            <button type="button" onclick="openAddPartner()" title="Add new partner" style="background:var(--surface3);border:1px solid var(--border2);color:var(--accent);border-radius:var(--radius-sm);padding:7px 10px;cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0;">+ Partner</button>
+          </div>
+          <div id="transporterCustomWrap" style="display:none;margin-top:6px;">
+            <input type="text" id="f_transporter_custom" placeholder="Type transporter name..." style="width:100%;">
+          </div>
+          <div id="ownTruckWrap" style="display:none;margin-top:6px;">
+            <input type="text" id="f_own_driver" placeholder="Driver name (optional)">
+          </div>
+          <div style="margin-top:5px;font-size:11px;color:var(--text3);">Click <strong style="color:var(--accent);cursor:pointer;" onclick="openAddPartner()">+ Partner</strong> to add or remove partners from this list</div>
+        </div>
+        <div class="field"><div class="field-label">Volume (ft³)</div><input type="text" id="f_volume" placeholder="e.g. 452ft EST"></div>
+        <div class="field"><div class="field-label">Collection Date</div><input type="date" id="f_movedate"></div>
+        <div class="field"><div class="field-label">Delivery Date</div><input type="date" id="f_deliverydate"></div>
+        <div class="field"><div class="field-label">Value (ZAR)</div><input type="number" id="f_value" placeholder="0.00"></div>
+        <div class="field"><div class="field-label">Cost (ZAR)</div><input type="number" id="f_cost" placeholder="0.00"></div>
+      </div>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="modal-section">
+      <div class="modal-section-title">Payment Status</div>
+      <div class="payment-selector">
+        <div class="payment-opt" onclick="setPayment('Unpaid')">Unpaid</div>
+        <div class="payment-opt" onclick="setPayment('Deposit Paid')">Deposit Paid</div>
+        <div class="payment-opt" onclick="setPayment('Fully Paid')">Fully Paid</div>
+      </div>
+    </div>
+
+    <!-- BOOKING OPTIONS -->
+    <div class="modal-section">
+      <div class="modal-section-title">Booking Options</div>
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">Shuttle Required</div>
+          <div class="toggle-row">
+            <div class="toggle-opt" onclick="setShuttle('Yes',this)">Yes</div>
+            <div class="toggle-opt active" onclick="setShuttle('No',this)">No</div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Insurance</div>
+          <div class="toggle-row">
+            <div class="toggle-opt" onclick="setInsurance('Yes',this)">Yes</div>
+            <div class="toggle-opt active" onclick="setInsurance('No',this)">No</div>
+          </div>
+        </div>
+        <div class="field" id="insuranceAmtField" style="display:none;">
+          <div class="field-label">Insured Value (ZAR)</div>
+          <input type="number" id="f_insurance_amt" placeholder="e.g. 150000">
+        </div>
+        <div class="field">
+          <div class="field-label">Storage</div>
+          <div class="toggle-row">
+            <div class="toggle-opt" onclick="setToggle('storage','Yes',this)">Yes</div>
+            <div class="toggle-opt active" onclick="setToggle('storage','No',this)">No</div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Redelivery</div>
+          <div class="toggle-row">
+            <div class="toggle-opt" onclick="setToggle('redelivery','Yes',this)">Yes</div>
+            <div class="toggle-opt active" onclick="setToggle('redelivery','No',this)">No</div>
+          </div>
+        </div>
+        <div class="field field-full">
+          <div class="field-label">Packing Items</div>
+          <input type="text" id="f_packing" placeholder="e.g. 1x TV wrap, 11x plastic sleeves">
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICING (shown for Deposit Needed stage) -->
+    <div class="modal-section" id="pricingSection">
+      <div class="modal-section-title">Pricing (for Zané to quote)</div>
+      <div class="field">
+        <textarea id="f_pricing" placeholder="Add our rates and pricing notes here..." maxlength="500" oninput="document.getElementById('pricingCount').textContent=500-this.value.length+' chars remaining'"></textarea>
+        <div class="char-count" id="pricingCount">500 chars remaining</div>
+      </div>
+    </div>
+
+    <!-- SPECIAL INSTRUCTIONS -->
+    <div class="modal-section">
+      <div class="modal-section-title">Special Instructions</div>
+      <div class="field">
+        <textarea id="f_notes" placeholder="Special instructions, access notes, parking info..."></textarea>
+      </div>
+    </div>
+
+    <!-- STATUS FLAGS -->
+    <div class="modal-section">
+      <div class="modal-section-title">Status Flags</div>
+      <div class="flag-row">
+        <div class="flag-opt" id="flag_tc" onclick="toggleFlag('tc')">T&amp;Cs Received</div>
+        <div class="flag-opt" id="flag_confirmed" onclick="toggleFlag('confirmed')">Confirmed</div>
+        <div class="flag-opt" id="flag_repeat" onclick="toggleFlag('repeat')">Repeat Customer</div>
+      </div>
+    </div>
+
+    <!-- ATTACHMENTS -->
+    <div class="modal-section">
+      <div class="modal-section-title">Attachments (Google Drive Links)</div>
+      <div id="filesList"></div>
+      <div style="display:flex;gap:7px;margin-top:6px;">
+        <input type="text" id="fileUrl" placeholder="Paste Google Drive URL..." style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 9px;font-size:12px;color:var(--text);flex:1;outline:none;font-family:'DM Sans',sans-serif;">
+        <input type="text" id="fileName" placeholder="Label..." style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 9px;font-size:12px;color:var(--text);width:110px;outline:none;font-family:'DM Sans',sans-serif;">
+        <button class="btn btn-secondary" onclick="addFile()" style="padding:6px 12px;font-size:12px;">+ Add</button>
+      </div>
+    </div>
+
+  </div><!-- /modal-body -->
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" onclick="deleteDeal()">Delete</button>
+    <button class="btn btn-review" id="requestReviewBtn" onclick="requestReview()" style="display:none;">⭐ Request Review</button>
+    <button class="btn btn-print" onclick="printJobSheet()">🖨 Print Sheet</button>
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveDeal()">Save Deal</button>
+  </div>
+</div>
+</div>
+
+<div id="printArea" class="print-sheet"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+
+const PRE = [
+  {id:'quote_request',label:'Quote Request',stripe:'#4f7cff'},
+  {id:'await_transporter',label:'Await Transporter Quote',stripe:'#6366f1'},
+  {id:'deposit_needed',label:'Deposit Needed',stripe:'#8b5cf6'},
+  {id:'ready_to_quote',label:'Ready to Quote',stripe:'#a855f7'},
+  {id:'quoted',label:'Quoted',stripe:'#ec4899'},
+  {id:'interested',label:'Interested',stripe:'#f59e0b'},
+  {id:'waiting',label:'Waiting',stripe:'#f97316'},
+  {id:'on_hold',label:'On Hold',stripe:'#f43f5e'},
+];
+
+const POST = [
+  {id:'ready_to_book',label:'Ready to Book',stripe:'#14b8a6'},
+  {id:'booked',label:'Booked',stripe:'#06b6d4'},
+  {id:'booking_confirmed',label:'Booking Confirmed',stripe:'#0ea5e9'},
+  {id:'collect',label:'Collect',stripe:'#eab308'},
+  {id:'storage',label:'Storage',stripe:'#84cc16'},
+  {id:'delivery',label:'Delivery',stripe:'#22c55e'},
+  {id:'review',label:'Review',stripe:'#f59e0b'},
+  {id:'won',label:'Won ✓',stripe:'#16a34a'},
+  {id:'lost',label:'Lost ✗',stripe:'#dc2626'},
+];
+
+const ALL_STAGES = [...PRE, ...POST];
+
+let partners = [
+  'Key Moves','H&M','H&M / TAC','Moving24','Mountain View',
+  'Magic','Magic Movers','Intertrans','TAC','Jippie Vervoer'
+];
+
+let curPipeline = 'pre';
+let curBoardView = 'board';
+let activeView = 'pipeline';
+let currentDealId = null;
+let currentPayment = '';
+let toggleState = {shuttle:'No',insurance:'No',storage:'No',redelivery:'No'};
+let flags = {tc:false,confirmed:false,repeat:false};
+
+let callReminders = [
+  {id:1,name:'Eleanor Whytock',type:'Collection'},
+  {id:2,name:'Leon Renney',type:'Collection'},
+  {id:3,name:'Forestry Plan',type:'Delivery'},
+];
+
+let leads = [
+  {id:1,name:'Henriette Cloete',label:'LATER',phone:'078 522 4627',from:'8 Witney Place, Westville',to:'Pretoria North',source:'Moving24',nextActivity:'Tomorrow',lost:false},
+  {id:2,name:'Esmeralda Kok',label:'',phone:'061 566 5288',from:'766 Melon street, EL',to:'Welgemoed, Bellville',source:'Moving24',nextActivity:'Today',lost:false},
+  {id:3,name:'Dee R Cartoulis',label:'NEXT',phone:'072 082 0620',from:'27 Harpuisbos Street',to:'Brettenwood Estate',source:'Moving24',nextActivity:'Tomorrow',lost:false},
+  {id:4,name:'Yvette Aniruth',label:'CURRENT',phone:'066 013 1191',from:'5 Laurentia Way',to:'Peter Mokaba Road',source:'Moving24',nextActivity:'Tomorrow',lost:false},
+  {id:5,name:'Larisa Nieman',label:'NEXT',phone:'082 789 4832',from:'5 Korhaan Street',to:'Kiepersol, Rivierview',source:'Moving24',nextActivity:'Today',lost:false},
+  {id:6,name:'Naledi Nonyane',label:'LATER',phone:'0630809410',from:'233 Rupert Street',to:'27 Iona Street, CPT',source:'Tri-Global',nextActivity:'Today',lost:false},
+  {id:7,name:'Marja Pretorius',label:'CURRENT',phone:'0833629010',from:'',to:'',source:'Whatsapp',nextActivity:'Tomorrow',lost:false},
+  {id:8,name:'JJ Wessels',label:'CURRENT',phone:'067 132 8114',from:'16 Vausedale Crescent',to:'Boomplaatslaan 81',source:'Moving24',nextActivity:'No activity',lost:false},
+];
+
+let deals = [
+  mk(1,'Bianca Dreyer','await_transporter','pre',{volume:'261ft',movedate:'2026-04-27',source:'Moving24'}),
+  mk(2,'Devin Deren','await_transporter','pre',{volume:'239ft',movedate:'2026-03-24',source:'Moving24'}),
+  mk(3,'Eagle Lifting Equipment Pty Ltd','await_transporter','pre',{volume:'923ft',movedate:'2026-03-12'}),
+  mk(4,'Terance Zakaria','await_transporter','pre',{volume:'303ft',movedate:'2026-03-20'}),
+  mk(5,'Marius Schoombee','ready_to_quote','pre',{volume:'1234ft',movedate:'2026-03-28',source:'Moving24'}),
+  mk(6,'Hendrik Bernardus Groenewald','quoted','pre',{volume:'2800ft EST',movedate:'2026-03-28',source:'Moving24',quo:'8363'}),
+  mk(7,'PJ Van Ginkel','quoted','pre',{volume:'1200ft EST',movedate:'2026-05-25',quo:'8364'}),
+  mk(8,"Fernanda E'Silva - Dedicated",'waiting','pre',{volume:'2100ft',quo:'8344'}),
+  mk(9,'Neil Barrand','ready_to_book','post',{quo:'8292',inv:'4656',transporter:'TAC',movedate:'2026-02-24',value:6325,cost:4440,payment:'Fully Paid',source:'Net4ce',tc:true,confirmed:true,repeat:true}),
+  mk(10,'Clint Pinchin','ready_to_book','post',{quo:'8345',transporter:'Key Moves',movedate:'2026-03-18',deliverydate:'2026-03-21',value:6980.50,cost:1800,source:'Net4ce'}),
+  mk(11,'Musa Hlangwane','booked','post',{quo:'8253',inv:'4651',transporter:'Key Moves',movedate:'2026-03-26',deliverydate:'2026-03-30',value:15134,cost:10500,payment:'Fully Paid',source:'Moving24',tc:true,confirmed:true}),
+  mk(12,'Leon Renney','booking_confirmed','post',{quo:'8362',inv:'4653',transporter:'H&M',movedate:'2026-03-10',deliverydate:'2026-03-13',value:43119.25,cost:7000,payment:'Fully Paid',source:'Moving24',tc:true,confirmed:true}),
+  mk(13,'Ernie Olivier','booking_confirmed','post',{quo:'8324',inv:'4654',transporter:'Key Moves',movedate:'2026-03-26',deliverydate:'2026-03-31',value:16054,cost:3500,payment:'Fully Paid',source:'Repeat Customer',tc:true,confirmed:true,repeat:true}),
+  mk(14,'Eleanor Whytock','collect','post',{quo:'8360',inv:'4652',transporter:'Key Moves',movedate:'2026-03-09',deliverydate:'2026-03-13',value:25472.50,cost:5500,payment:'Fully Paid',source:'Email',tc:true,confirmed:true,notes:'Client will arrange own shuttle'}),
+  mk(15,'Jenny Pottow AFR','storage','post',{quo:'8190',inv:'4639',movedate:'2026-03-09',deliverydate:'2026-03-09',value:6900,cost:3100,payment:'Fully Paid',source:'Repeat Customer',storage:'Yes',tc:true,confirmed:true,repeat:true}),
+  mk(16,'Forestry Plan and Equipment','delivery','post',{quo:'8313',inv:'4644',transporter:'Intertrans',movedate:'2026-03-04',deliverydate:'2026-03-07',value:51060,cost:43000,payment:'Fully Paid',source:'Repeat Customer',tc:true,confirmed:true,repeat:true}),
+  mk(17,'Santie van Zyl','delivery','post',{quo:'8284',inv:'4642',transporter:'Magic Movers',movedate:'2026-03-05',deliverydate:'2026-03-09',value:18745,cost:12782.50,payment:'Deposit Paid',source:'Net4ce',tc:true,confirmed:true}),
+  mk(18,'Corrie Boshoff','won','post',{quo:'8211',inv:'4626',transporter:'Key Moves',movedate:'2026-07-03',deliverydate:'2026-07-07',value:47782.50,cost:29500,payment:'Deposit Paid',source:'Moving24',tc:true,confirmed:true}),
+  mk(19,'Kristen Steynberg','won','post',{quo:'8145',inv:'4628',transporter:'Magic',movedate:'2026-04-08',deliverydate:'2026-04-13',value:20493,cost:10775,payment:'Deposit Paid',source:'Repeat Customer',tc:true,confirmed:true,repeat:true}),
+  mk(20,'Magda Huisamen','won','post',{quo:'8190',inv:'4639',transporter:'H&M',movedate:'2026-05-22',deliverydate:'2026-05-25',value:20010,cost:14245,payment:'Deposit Paid',source:'Moving24',tc:true,confirmed:true}),
+];
+
+function mk(id,name,stage,pipeline,extra={}) {
+  return {id,name,stage,pipeline,company:'',contact_person:'',phone:'',phone2:'',email:'',email2:'',
+    source:'',from:'',to:'',quo:'',inv:'',transporter:'',volume:'',movedate:'',deliverydate:'',
+    value:0,cost:0,payment:'',shuttle:'No',shuttle_from_who:'',shuttle_from_note:'',
+    shuttle_to_who:'',shuttle_to_note:'',insurance:'No',insurance_amt:'',
+    storage:'No',redelivery:'No',packing:'',notes:'',pricing:'',
+    tc:false,confirmed:false,repeat:false,files:[],xeroLinked:false,...extra};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+
+function zar(v){if(!v||v==0)return'';return'R'+Number(v).toLocaleString('en-ZA',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function fmtDate(d){if(!d)return'';const p=d.split('-');return`${p[2]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1]}`;}
+function fmtMonthYear(d){if(!d)return'Unknown';const p=d.split('-');return`${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1]} ${p[0]}`;}
+function stageLabel(id){return ALL_STAGES.find(s=>s.id===id)?.label||id;}
+
+// ═══════════════════════════════════════════════════════════════
+// CALL REMINDERS
+// ═══════════════════════════════════════════════════════════════
+
+function renderCallList(){
+  const el=document.getElementById('callList');
+  if(!callReminders.length){document.getElementById('alertBanner').style.display='none';return;}
+  el.innerHTML=callReminders.map(c=>`
+    <div class="alert-call" onclick="openDealByName('${c.name}')">
+      📞 ${c.name} <span style="opacity:.7;font-size:10px;">(${c.type})</span>
+      <span class="alert-call-dismiss" title="Done" onclick="event.stopPropagation();dismissCall(${c.id})">✓</span>
+    </div>`).join('');
+}
+
+function dismissCall(id){
+  callReminders=callReminders.filter(c=>c.id!==id);
+  renderCallList();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER BOARD
+// ═══════════════════════════════════════════════════════════════
+
+function renderBoard(){
+  const board=document.getElementById('board');
+  board.innerHTML='';
+  const stages=curPipeline==='pre'?PRE:POST;
+
+  stages.forEach(stage=>{
+    const visible=stage.id!=='won'&&stage.id!=='lost';
+    const stageDeals=deals.filter(d=>d.stage===stage.id&&d.pipeline===curPipeline);
+    const visibleDeals=visible?stageDeals:[];
+    const total=stageDeals.reduce((s,d)=>s+(+d.value||0),0);
+
+    const col=document.createElement('div');
+    col.className='col'+(stage.id==='won'?' col-won':'')+(stage.id==='lost'?' col-lost':'')+(stage.id==='review'?' col-review':'');
+    col.dataset.stage=stage.id;
+
+    const sortedByMonth = stageDeals.sort((a,b)=>(b.deliverydate||'').localeCompare(a.deliverydate||''));
+    const grouped = {};
+    sortedByMonth.forEach(d=>{
+      const key=fmtMonthYear(d.deliverydate||d.movedate);
+      if(!grouped[key])grouped[key]=[];
+      grouped[key].push(d);
+    });
+
+    let wlHtml='';
+    if(!visible){
+      Object.entries(grouped).forEach(([month,mDeals])=>{
+        wlHtml+=`<div class="wl-month-label">${month}</div>`;
+        wlHtml+=mDeals.map(d=>cardHTML(d)).join('');
+      });
+    }
+
+    col.innerHTML=`
+      <div class="col-head">
+        <div class="col-title-row">
+          <div class="col-title" style="color:${stage.stripe}">${stage.label}</div>
+          <div class="col-count">${stageDeals.length}</div>
+        </div>
+        ${total?`<div class="col-value">${zar(total)}</div>`:''}
+        <div class="col-stripe" style="background:${stage.stripe}"></div>
+      </div>
+      ${visible?`
+      <div class="col-cards" id="cards-${stage.id}"
+        ondragover="event.preventDefault();this.closest('.col').classList.add('drag-over')"
+        ondragleave="this.closest('.col').classList.remove('drag-over')"
+        ondrop="dropCard(event,'${stage.id}')">
+        ${visibleDeals.map(d=>cardHTML(d)).join('')}
+      </div>`:`
+      <div class="won-lost-section">
+        <div class="wl-header" onclick="toggleWL('wl-${stage.id}',this)">
+          <span>${stageDeals.length} ${stage.id==='won'?'won':'lost'} deal${stageDeals.length!==1?'s':''} — click to expand</span>
+          <span id="wl-arr-${stage.id}">▶</span>
+        </div>
+        <div class="wl-cards" id="wl-${stage.id}">${wlHtml}</div>
+      </div>`}
+    `;
+    board.appendChild(col);
+  });
+
+  updatePipeTotal();
+}
+
+function toggleWL(id,hdr){
+  const el=document.getElementById(id);
+  const arr=document.getElementById('wl-arr-'+id.replace('wl-',''));
+  if(el.classList.toggle('open')){arr.textContent='▼';}else{arr.textContent='▶';}
+}
+
+function cardHTML(d){
+  const profit=(+d.value||0)-(+d.cost||0);
+  let payTag='';
+  if(d.payment==='Fully Paid')payTag='<span class="tag tag-paid">Fully Paid</span>';
+  else if(d.payment==='Deposit Paid')payTag='<span class="tag tag-deposit">Deposit</span>';
+  else if(d.payment==='Unpaid')payTag='<span class="tag tag-unpaid">Unpaid</span>';
+  const shutTag=d.shuttle==='Yes'?'<span class="tag tag-shuttle">🚐 Shuttle</span>':'';
+  const srcTag=d.source?`<span class="tag tag-source">${d.source}</span>`:'';
+
+  // Breadcrumb for hover
+  const pipeStages=d.pipeline==='pre'?PRE:[...POST];
+  const bcHtml=pipeStages.map(s=>`<span class="bc-step${s.id===d.stage?' current':''}">${s.label.split(' ')[0]}</span>${s.id!==pipeStages[pipeStages.length-1].id?'<span class="bc-sep">›</span>':''}`).join('');
+
+  return `<div class="card" draggable="true" data-id="${d.id}"
+    ondragstart="window._dragId=${d.id}"
+    onclick="openDeal(${d.id})">
+    <div class="card-breadcrumb">${bcHtml}</div>
+    ${d.company?`<div class="card-company">${d.company}</div>`:''}
+    <div class="card-name">${d.name}</div>
+    <div class="card-meta">
+      ${d.transporter?`<div class="card-row"><span class="icon">🚛</span>${d.transporter}</div>`:''}
+      ${d.shuttle==='Yes'&&(d.shuttle_from_who||d.shuttle_to_who)?`<div class="card-row" style="color:var(--purple);font-size:10.5px;"><span class="icon">🚐</span>${[d.shuttle_from_who?(d.shuttle_from_who+(d.shuttle_from_note?' ('+d.shuttle_from_note+')':'')+' [FROM]'):'', d.shuttle_to_who?(d.shuttle_to_who+(d.shuttle_to_note?' ('+d.shuttle_to_note+')':'')+' [TO]'):''].filter(Boolean).join(' · ')}</div>`:''}
+      ${d.movedate?`<div class="card-row"><span class="icon">📅</span>${fmtDate(d.movedate)}${d.deliverydate?' → '+fmtDate(d.deliverydate):''}</div>`:''}
+      ${d.value?`<div class="card-row"><span class="icon">💰</span>${zar(d.value)}${profit>0?' <span style="color:var(--green);font-size:10px;">(+'+zar(profit)+')</span>':''}</div>`:''}
+      ${d.quo?`<div class="card-row"><span class="icon">🔖</span>QUO ${d.quo}${d.inv?' · INV '+d.inv:''}</div>`:''}
+    </div>
+    <div class="card-tags">${payTag}${shutTag}${srcTag}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════════════════════════
+
+function dropCard(e,stageId){
+  e.preventDefault();
+  document.querySelectorAll('.col').forEach(c=>c.classList.remove('drag-over'));
+  const id=window._dragId;if(!id)return;
+  const d=deals.find(x=>x.id===id);
+  if(!d)return;
+  d.stage=stageId;
+  if(POST.find(s=>s.id===stageId))d.pipeline='post';
+  if(stageId==='won')autoPopulate(d);
+  window._dragId=null;
+  renderBoard();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LEADS
+// ═══════════════════════════════════════════════════════════════
+
+function renderLeads(){
+  const active=leads.filter(l=>!l.lost);
+  const lost=leads.filter(l=>l.lost);
+  const tbody=document.getElementById('leadsBody');
+  const countEl=document.getElementById('leadsCount');
+  if(countEl) countEl.textContent=`${active.length} active · ${lost.length} lost`;
+  const rows=[...active,...lost].map(l=>{
+    let lc='';
+    if(l.label==='CURRENT')lc='tag-label-current';
+    else if(l.label==='NEXT')lc='tag-label-next';
+    else if(l.label==='LATER')lc='tag-label-later';
+    let ac='';
+    if(l.nextActivity==='Today')ac='next-today';
+    else if(l.nextActivity==='Tomorrow')ac='next-tomorrow';
+    else ac='next-overdue';
+    return `<tr style="${l.lost?'opacity:.45;':''}">
+      <td style="color:var(--text);font-weight:500;cursor:pointer;" onclick="openEditLead(${l.id})">${l.name}${l.lost?' <span style="font-size:10px;color:#f87171">(Lost)</span>':''}</td>
+      <td>${l.label?`<span class="tag ${lc}">${l.label}</span>`:''}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11.5px">${l.phone}</td>
+      <td>${l.from||'—'}</td><td>${l.to||'—'}</td>
+      <td><span class="tag tag-source">${l.source||'—'}</span></td>
+      <td class="${ac}">${l.nextActivity}</td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap;">
+        ${!l.lost?`
+          <button class="qualify-btn" onclick="qualifyLead(${l.id})">→ Pipeline</button>
+          <button class="lose-lead-btn" onclick="loseLead(${l.id})">✗ Lost</button>
+          <button class="lose-lead-btn" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)" onclick="confirmDeleteLead(${l.id})">🗑</button>
+        `:`
+          <button class="qualify-btn" onclick="restoreLead(${l.id})">↩ Restore</button>
+          <button class="lose-lead-btn" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)" onclick="confirmDeleteLead(${l.id})">🗑</button>
+        `}
+      </td>
+    </tr>`;
+  }).join('');
+  tbody.innerHTML=rows||'<tr><td colspan="8" style="color:var(--text3);padding:20px;text-align:center;">No leads yet — click + Lead to add one</td></tr>';
+}
+
+let currentLeadId = null;
+
+function openNewLead(){
+  currentLeadId = null;
+  document.getElementById('leadModalTitle').textContent = 'New Lead';
+  document.getElementById('leadDeleteBtn').style.display = 'none';
+  document.getElementById('lf_name').value = '';
+  document.getElementById('lf_phone').value = '';
+  document.getElementById('lf_source').value = '';
+  document.getElementById('lf_from').value = '';
+  document.getElementById('lf_to').value = '';
+  document.getElementById('lf_label').value = '';
+  document.getElementById('lf_activity').value = 'Today';
+  document.getElementById('leadModalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('lf_name').focus(), 100);
+}
+
+function openEditLead(id){
+  const l = leads.find(x=>x.id===id);
+  if(!l) return;
+  currentLeadId = id;
+  document.getElementById('leadModalTitle').textContent = 'Edit Lead';
+  document.getElementById('leadDeleteBtn').style.display = 'flex';
+  document.getElementById('lf_name').value = l.name;
+  document.getElementById('lf_phone').value = l.phone;
+  document.getElementById('lf_source').value = l.source||'';
+  document.getElementById('lf_from').value = l.from||'';
+  document.getElementById('lf_to').value = l.to||'';
+  document.getElementById('lf_label').value = l.label||'';
+  document.getElementById('lf_activity').value = l.nextActivity||'Today';
+  document.getElementById('leadModalOverlay').classList.add('open');
+}
+
+function closeLeadModal(){
+  document.getElementById('leadModalOverlay').classList.remove('open');
+  currentLeadId = null;
+}
+
+function saveLead(){
+  const name = document.getElementById('lf_name').value.trim();
+  if(!name){ document.getElementById('lf_name').focus(); return; }
+  if(currentLeadId){
+    const l = leads.find(x=>x.id===currentLeadId);
+    if(l){
+      l.name = name;
+      l.phone = document.getElementById('lf_phone').value;
+      l.source = document.getElementById('lf_source').value;
+      l.from = document.getElementById('lf_from').value;
+      l.to = document.getElementById('lf_to').value;
+      l.label = document.getElementById('lf_label').value;
+      l.nextActivity = document.getElementById('lf_activity').value;
+    }
+  } else {
+    leads.push({
+      id: Date.now(),
+      name,
+      phone: document.getElementById('lf_phone').value,
+      source: document.getElementById('lf_source').value,
+      from: document.getElementById('lf_from').value,
+      to: document.getElementById('lf_to').value,
+      label: document.getElementById('lf_label').value,
+      nextActivity: document.getElementById('lf_activity').value,
+      lost: false,
+    });
+  }
+  closeLeadModal();
+  renderLeads();
+}
+
+function deleteLead(){
+  if(!currentLeadId) return;
+  if(!confirm('Permanently delete this lead?')) return;
+  leads = leads.filter(x=>x.id !== currentLeadId);
+  closeLeadModal();
+  renderLeads();
+}
+
+function confirmDeleteLead(id){
+  if(!confirm('Permanently delete this lead?')) return;
+  leads = leads.filter(x=>x.id !== id);
+  renderLeads();
+}
+
+function qualifyLead(id){
+  const l=leads.find(x=>x.id===id);
+  if(!l)return;
+  const nd=mk(Date.now(),l.name,'quote_request','pre',{phone:l.phone,source:l.source,from:l.from,to:l.to});
+  deals.push(nd);
+  leads=leads.filter(x=>x.id!==id);
+  renderLeads();
+  alert(`✓ ${l.name} moved to Pre-Booking → Quote Request`);
+}
+
+function loseLead(id){
+  const l=leads.find(x=>x.id===id);
+  if(l){l.lost=true;renderLeads();}
+}
+
+function restoreLead(id){
+  const l=leads.find(x=>x.id===id);
+  if(l){l.lost=false;renderLeads();}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LIST VIEW
+// ═══════════════════════════════════════════════════════════════
+
+function renderList(){
+  const tbody=document.getElementById('listBody');
+  const d=deals.filter(x=>x.pipeline===curPipeline&&x.stage!=='won'&&x.stage!=='lost');
+  tbody.innerHTML=d.map(x=>{
+    const profit=(+x.value||0)-(+x.cost||0);
+    let pc='';
+    if(x.payment==='Fully Paid')pc='color:#4ade80';
+    else if(x.payment==='Deposit Paid')pc='color:#fbbf24';
+    else if(x.payment==='Unpaid')pc='color:#f87171';
+    return `<tr onclick="openDeal(${x.id})">
+      <td>${x.quo||'—'}</td><td>${x.inv||'—'}</td>
+      <td class="client-col">${x.company?`<span style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;">${x.company} · </span>`:''}${x.name}</td>
+      <td>${x.transporter||'—'}</td>
+      <td>${fmtDate(x.movedate)||'—'}</td><td>${fmtDate(x.deliverydate)||'—'}</td>
+      <td style="color:var(--text2)">${stageLabel(x.stage)}</td>
+      <td style="${pc}">${x.payment||'—'}</td>
+      <td style="font-family:'DM Mono',monospace">${x.value?zar(x.value):'—'}</td>
+      <td style="font-family:'DM Mono',monospace">${x.cost?zar(x.cost):'—'}</td>
+      <td style="font-family:'DM Mono',monospace;color:${profit>0?'#4ade80':'var(--text3)'}">${profit>0?zar(profit):'—'}</td>
+      <td>${x.source||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════════
+
+function doSearch(q){
+  const res=document.getElementById('searchResults');
+  if(!q.trim()){res.classList.remove('open');return;}
+  const ql=q.toLowerCase();
+  const active=deals.filter(d=>d.stage!=='won'&&d.stage!=='lost'&&(d.name.toLowerCase().includes(ql)||d.company.toLowerCase().includes(ql)||d.phone.toLowerCase().includes(ql)));
+  const won=deals.filter(d=>d.stage==='won'&&(d.name.toLowerCase().includes(ql)||d.company.toLowerCase().includes(ql)));
+  const lost=deals.filter(d=>d.stage==='lost'&&(d.name.toLowerCase().includes(ql)||d.company.toLowerCase().includes(ql)));
+  const leadRes=leads.filter(l=>l.name.toLowerCase().includes(ql)||l.phone.toLowerCase().includes(ql));
+
+  let html='';
+  if(leadRes.length){html+=`<div class="search-group-label">Leads</div>`;html+=leadRes.map(l=>`<div class="search-item" onclick="showView('leads',document.querySelector('.nav-tab'));closeSearch()"><div class="search-item-name">${l.name}</div><div class="search-item-meta">${l.phone} · ${l.source}</div></div>`).join('');}
+  if(active.length){html+=`<div class="search-group-label">Active Deals</div>`;html+=active.map(d=>`<div class="search-item" onclick="openDeal(${d.id});closeSearch()"><div class="search-item-name">${d.company?d.company+' · ':''}${d.name}</div><div class="search-item-meta">${stageLabel(d.stage)} · ${d.transporter||'No transporter'}</div></div>`).join('');}
+  if(won.length){html+=`<div class="search-group-label">Won</div>`;html+=won.map(d=>`<div class="search-item" onclick="openDeal(${d.id});closeSearch()"><div class="search-item-name">${d.name}</div><div class="search-item-meta">Won · ${fmtDate(d.deliverydate)}</div></div>`).join('');}
+  if(lost.length){html+=`<div class="search-group-label">Lost</div>`;html+=lost.map(d=>`<div class="search-item" onclick="openDeal(${d.id});closeSearch()"><div class="search-item-name">${d.name}</div><div class="search-item-meta">Lost · ${fmtDate(d.deliverydate)}</div></div>`).join('');}
+  if(!html)html='<div style="padding:12px 14px;font-size:12px;color:var(--text3);">No results found</div>';
+  res.innerHTML=html;
+  res.classList.add('open');
+}
+
+function closeSearch(){document.getElementById('searchResults').classList.remove('open');}
+
+// ═══════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════
+
+function openDeal(id){
+  const d=deals.find(x=>x.id===id);
+  if(!d)return;
+  currentDealId=id;
+
+  document.getElementById('f_company').value=d.company||'';
+  document.getElementById('f_name').value=d.name;
+  document.getElementById('f_contact_person').value=d.contact_person||'';
+  document.getElementById('f_phone').value=d.phone;
+  document.getElementById('f_phone2').value=d.phone2||'';
+  document.getElementById('f_email').value=d.email;
+  document.getElementById('f_email2').value=d.email2||'';
+  document.getElementById('f_source').value=d.source;
+  document.getElementById('f_from').value=d.from;
+  document.getElementById('f_to').value=d.to;
+  document.getElementById('f_quo').value=d.quo;
+  document.getElementById('f_inv').value=d.inv;
+  document.getElementById('f_transporter').value=d.transporter;
+  document.getElementById('f_volume').value=d.volume;
+  buildTransporterDropdown(d.transporter||'');
+  // Show own driver field if needed
+  if(d.transporter && d.transporter.startsWith('Own Truck')){
+    document.getElementById('ownTruckWrap').style.display='block';
+    document.getElementById('f_own_driver').value=d.transporter.replace('Own Truck — ','').replace('Own Truck','');
+  } else {
+    document.getElementById('ownTruckWrap').style.display='none';
+    document.getElementById('f_own_driver').value='';
+  }
+  document.getElementById('f_movedate').value=d.movedate;
+  document.getElementById('f_deliverydate').value=d.deliverydate;
+  document.getElementById('f_value').value=d.value||'';
+  document.getElementById('f_cost').value=d.cost||'';
+  document.getElementById('f_packing').value=d.packing;
+  document.getElementById('f_notes').value=d.notes;
+  document.getElementById('f_pricing').value=d.pricing||'';
+  document.getElementById('f_shuttle_from_who').value=d.shuttle_from_who||'';
+  document.getElementById('f_shuttle_from_note').value=d.shuttle_from_note||'';
+  document.getElementById('f_shuttle_to_who').value=d.shuttle_to_who||'';
+  document.getElementById('f_shuttle_to_note').value=d.shuttle_to_note||'';
+  document.getElementById('f_insurance_amt').value=d.insurance_amt||'';
+  const pc=500-(d.pricing||'').length;
+  document.getElementById('pricingCount').textContent=pc+' chars remaining';
+
+  // Show/hide extra contacts
+  const hasExtra=d.phone2||d.email2;
+  document.getElementById('extraContactFields').style.display=hasExtra?'block':'none';
+
+  // Payment, toggles, flags
+  currentPayment=d.payment||'';
+  setPayment(currentPayment,true);
+  toggleState={shuttle:d.shuttle||'No',insurance:d.insurance||'No',storage:d.storage||'No',redelivery:d.redelivery||'No'};
+  refreshAllToggles();
+  setShuttleVisibility(d.shuttle==='Yes');
+  setInsuranceVisibility(d.insurance==='Yes');
+  flags={tc:d.tc,confirmed:d.confirmed,repeat:d.repeat};
+  refreshFlags();
+
+  // Subtitle
+  document.getElementById('modalSubtitle').textContent=`${stageLabel(d.stage)} · ${d.pipeline==='pre'?'Pre-Booking':'Post-Booking'}`;
+
+  // Xero btn
+  const xb=document.getElementById('xeroBtn');
+  if(d.xeroLinked){xb.textContent='✓ Linked to Xero';xb.classList.add('linked');}
+  else{xb.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="#0db465"><circle cx="12" cy="12" r="10"/><text x="6" y="16" font-size="12" fill="white" font-family="Arial" font-weight="bold">X</text></svg> Sync to Xero';xb.classList.remove('linked');}
+
+  // Review btn
+  document.getElementById('requestReviewBtn').style.display=d.stage==='review'?'flex':'none';
+
+  // Pricing section - show for deposit_needed or always
+  document.getElementById('pricingSection').style.display='block';
+
+  // Stage progress + dropdown
+  buildStageUI(d);
+
+  // Files
+  renderFiles(d.files||[]);
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function openDealByName(name){
+  const d=deals.find(x=>x.name.toLowerCase().includes(name.toLowerCase()));
+  if(d)openDeal(d.id);
+}
+
+function openNewDeal(){
+  const nd=mk(Date.now(),'',curPipeline==='pre'?'quote_request':'ready_to_book',curPipeline);
+  deals.push(nd);
+  openDeal(nd.id);
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  currentDealId=null;
+}
+
+function buildStageUI(d){
+  const stages=d.pipeline==='pre'?PRE:POST;
+  const idx=stages.findIndex(s=>s.id===d.stage);
+
+  // Dropdown
+  const dd=document.getElementById('stageDropdown');
+  dd.innerHTML=[...PRE,...POST].map(s=>`<option value="${s.id}"${s.id===d.stage?' selected':''}>${s.id.startsWith(PRE[0].id)||PRE.find(x=>x.id===s.id)?'Pre: ':'Post: '}${s.label}</option>`).join('');
+
+  // Progress bar
+  const bar=document.getElementById('stageProgress');
+  bar.innerHTML=stages.map((s,i)=>{
+    let cls='sp-step';
+    if(i<idx)cls+=' done';
+    if(i===idx)cls+=' current';
+    if(s.id==='won')cls+=' won-step';
+    if(s.id==='lost')cls+=' lost-step';
+    return `<div class="${cls}" onclick="quickStage('${s.id}')" title="${s.label}">${s.label}</div>`;
+  }).join('');
+}
+
+function stageDropdownChange(val){
+  const d=deals.find(x=>x.id===currentDealId);
+  if(!d)return;
+  d.stage=val;
+  if(POST.find(s=>s.id===val))d.pipeline='post';
+  else d.pipeline='pre';
+  document.getElementById('modalSubtitle').textContent=`${stageLabel(val)} · ${d.pipeline==='pre'?'Pre-Booking':'Post-Booking'}`;
+  buildStageUI(d);
+  document.getElementById('requestReviewBtn').style.display=val==='review'?'flex':'none';
+  if(val==='won')autoPopulate(d);
+}
+
+function quickStage(stageId){
+  document.getElementById('stageDropdown').value=stageId;
+  stageDropdownChange(stageId);
+}
+
+function saveDeal(){
+  const d=deals.find(x=>x.id===currentDealId);
+  if(!d)return;
+  d.company=document.getElementById('f_company').value;
+  d.name=document.getElementById('f_name').value||'Unnamed Deal';
+  d.contact_person=document.getElementById('f_contact_person').value;
+  d.phone=document.getElementById('f_phone').value;
+  d.phone2=document.getElementById('f_phone2').value;
+  d.email=document.getElementById('f_email').value;
+  d.email2=document.getElementById('f_email2').value;
+  d.source=document.getElementById('f_source').value;
+  d.from=document.getElementById('f_from').value;
+  d.to=document.getElementById('f_to').value;
+  d.quo=document.getElementById('f_quo').value;
+  d.inv=document.getElementById('f_inv').value;
+  d.transporter=getTransporterValue();
+  d.volume=document.getElementById('f_volume').value;
+  d.movedate=document.getElementById('f_movedate').value;
+  d.deliverydate=document.getElementById('f_deliverydate').value;
+  d.value=document.getElementById('f_value').value;
+  d.cost=document.getElementById('f_cost').value;
+  d.packing=document.getElementById('f_packing').value;
+  d.notes=document.getElementById('f_notes').value;
+  d.pricing=document.getElementById('f_pricing').value;
+  d.shuttle_from_who=document.getElementById('f_shuttle_from_who').value;
+  d.shuttle_from_note=document.getElementById('f_shuttle_from_note').value;
+  d.shuttle_to_who=document.getElementById('f_shuttle_to_who').value;
+  d.shuttle_to_note=document.getElementById('f_shuttle_to_note').value;
+  d.insurance_amt=document.getElementById('f_insurance_amt').value;
+  d.payment=currentPayment;
+  Object.assign(d,toggleState);
+  d.tc=flags.tc;d.confirmed=flags.confirmed;d.repeat=flags.repeat;
+  d.stage=document.getElementById('stageDropdown').value;
+  if(POST.find(s=>s.id===d.stage))d.pipeline='post';else d.pipeline='pre';
+  closeModal();
+  if(activeView==='pipeline')renderBoard();
+  else if(activeView==='listview')renderList();
+}
+
+function deleteDeal(){
+  if(!confirm('Delete this deal permanently?'))return;
+  deals=deals.filter(x=>x.id!==currentDealId);
+  closeModal();
+  renderBoard();
+}
+
+function requestReview(){
+  const d=deals.find(x=>x.id===currentDealId);
+  if(!d)return;
+  alert(`Review request would be sent to ${d.name} at ${d.email||d.phone||'(no contact saved)'}\n\nIn production this sends a Google review link via email/WhatsApp.`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORM CONTROLS
+// ═══════════════════════════════════════════════════════════════
+
+function setPayment(val,silent){
+  currentPayment=val;
+  document.querySelectorAll('.payment-opt').forEach(o=>{
+    o.className='payment-opt';
+    if(o.textContent==='Unpaid'&&val==='Unpaid')o.classList.add('active-unpaid');
+    if(o.textContent==='Deposit Paid'&&val==='Deposit Paid')o.classList.add('active-deposit');
+    if(o.textContent==='Fully Paid'&&val==='Fully Paid')o.classList.add('active-paid');
+  });
+}
+
+function setShuttle(val,el){
+  toggleState.shuttle=val;
+  el.parentElement.querySelectorAll('.toggle-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  setShuttleVisibility(val==='Yes');
+}
+
+function setShuttleVisibility(show){
+  document.getElementById('shuttleFromWrap').style.display=show?'block':'none';
+  document.getElementById('shuttleToWrap').style.display=show?'block':'none';
+}
+
+function setInsurance(val,el){
+  toggleState.insurance=val;
+  el.parentElement.querySelectorAll('.toggle-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  setInsuranceVisibility(val==='Yes');
+}
+
+function setInsuranceVisibility(show){
+  document.getElementById('insuranceAmtField').style.display=show?'flex':'none';
+}
+
+function setToggle(key,val,el){
+  toggleState[key]=val;
+  el.parentElement.querySelectorAll('.toggle-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function refreshAllToggles(){
+  // shuttle
+  document.querySelectorAll('#modal .toggle-opt').forEach(o=>{
+    const row=o.parentElement;
+    const prev=row.previousElementSibling;
+    if(!prev)return;
+    const label=prev.textContent.trim();
+    let key='';
+    if(label.includes('Shuttle'))key='shuttle';
+    else if(label.includes('Insurance'))key='insurance';
+    else if(label.includes('Storage'))key='storage';
+    else if(label.includes('Redelivery'))key='redelivery';
+    if(key)o.classList.toggle('active',o.textContent===toggleState[key]);
+  });
+}
+
+function toggleFlag(key){
+  flags[key]=!flags[key];
+  refreshFlags();
+}
+
+function refreshFlags(){
+  ['tc','confirmed','repeat'].forEach(k=>{
+    document.getElementById('flag_'+k).classList.toggle('active',flags[k]);
+  });
+}
+
+function toggleExtraContact(){
+  const el=document.getElementById('extraContactFields');
+  el.style.display=el.style.display==='none'?'block':'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FILES
+// ═══════════════════════════════════════════════════════════════
+
+function renderFiles(files){
+  const el=document.getElementById('filesList');
+  if(!files.length){el.innerHTML='<div style="color:var(--text3);font-size:12px;margin-bottom:6px;">No attachments yet</div>';return;}
+  el.innerHTML=files.map((f,i)=>`<div class="file-item"><span style="color:var(--accent)">📎</span><a href="${f.url}" target="_blank">${f.name}</a><span style="cursor:pointer;color:var(--text3);margin-left:auto" onclick="removeFile(${i})">×</span></div>`).join('');
+}
+
+function addFile(){
+  const url=document.getElementById('fileUrl').value.trim();
+  const name=document.getElementById('fileName').value.trim()||'File';
+  if(!url)return;
+  const d=deals.find(x=>x.id===currentDealId);
+  if(!d)return;
+  if(!d.files)d.files=[];
+  d.files.push({url,name});
+  document.getElementById('fileUrl').value='';
+  document.getElementById('fileName').value='';
+  renderFiles(d.files);
+}
+
+function removeFile(i){
+  const d=deals.find(x=>x.id===currentDealId);
+  if(!d)return;
+  d.files.splice(i,1);
+  renderFiles(d.files);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// XERO INTEGRATION — OAuth2 PKCE (Real Implementation)
+// ═══════════════════════════════════════════════════════════════
+
+const XERO = {
+  clientId:    '6AC6CAE068864131AB95991E05CA5730',
+  clientSecret:'7uesOqxOwzqDXdw7B52061glIzCkucVQqMjMtyWZkH4BxVcR',
+  proxyUrl:    'https://script.google.com/macros/s/AKfycbz52uVQPx26y2JTLukQesd9gVr6RlRCMFYfMcS2EcwUhJ9fZRPNjMihsbWMlt70ZI2U/exec',
+  redirectUri: 'https://africanfurnitureremovals.co.za/crm/xero-callback.html',
+  scopes:      'openid profile email accounting.contacts accounting.transactions',
+  authEndpoint:'https://login.xero.com/identity/connect/authorize',
+  tokenEndpoint:'https://identity.xero.com/connect/token',
+  apiBase:     'https://api.xero.com/api.xro/2.0',
+};
+
+// ── Token storage (sessionStorage — clears when tab closes) ──
+function xeroSaveToken(t){ sessionStorage.setItem('xero_token', JSON.stringify(t)); }
+function xeroGetToken(){ const r=sessionStorage.getItem('xero_token'); return r?JSON.parse(r):null; }
+function xeroClearToken(){ sessionStorage.removeItem('xero_token'); sessionStorage.removeItem('xero_tenant'); }
+function xeroSaveTenant(id){ sessionStorage.setItem('xero_tenant',id); }
+function xeroGetTenant(){ return sessionStorage.getItem('xero_tenant')||''; }
+
+// ── PKCE helpers ──
+function base64url(buf){
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function pkceChallenge(){
+  const verifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
+  const digest   = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+  return { verifier, challenge: base64url(digest) };
+}
+
+// ── Step 1: Open Xero login popup ──
+let _xeroResolve=null, _xeroState='';
+async function xeroLogin(){
+  const {verifier,challenge} = await pkceChallenge();
+  _xeroState = base64url(crypto.getRandomValues(new Uint8Array(8)));
+  sessionStorage.setItem('xero_verifier', verifier);
+
+  const url = XERO.authEndpoint + '?' + new URLSearchParams({
+    response_type: 'code',
+    client_id:     XERO.clientId,
+    redirect_uri:  XERO.redirectUri,
+    scope:         XERO.scopes,
+    state:         _xeroState,
+    code_challenge:        challenge,
+    code_challenge_method: 'S256',
+  });
+
+  return new Promise((resolve,reject)=>{
+    _xeroResolve = resolve;
+    const popup = window.open(url,'XeroLogin','width=600,height=700,left=200,top=100');
+    if(!popup){ reject(new Error('Popup blocked — please allow popups for this site.')); return; }
+
+    // Listen for callback message from xero-callback.html
+    function onMsg(e){
+      if(e.origin !== 'https://africanfurnitureremovals.co.za') return;
+      if(e.data?.type !== 'XERO_CALLBACK') return;
+      window.removeEventListener('message', onMsg);
+      if(e.data.error){ reject(new Error('Xero login cancelled or failed: '+e.data.error)); return; }
+      if(e.data.state !== _xeroState){ reject(new Error('State mismatch — possible CSRF')); return; }
+      resolve(e.data.code);
+    }
+    window.addEventListener('message', onMsg);
+  });
+}
+
+// ── Step 2: Exchange code for token ──
+async function xeroExchangeCode(code){
+  const resp = await fetch(XERO.proxyUrl, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({grant_type:'authorization_code', code}),
+  });
+  if(!resp.ok) throw new Error('Token exchange failed: '+await resp.text());
+  const token = await resp.json();
+  if(token.error) throw new Error('Xero error: '+token.error_description||token.error);
+  token.expires_at = Date.now() + token.expires_in * 1000;
+  xeroSaveToken(token);
+  return token;
+}
+
+// ── Step 3: Refresh token if expired ──
+async function xeroEnsureToken(){
+  let token = xeroGetToken();
+  if(!token) throw new Error('NOT_AUTHED');
+  if(Date.now() > token.expires_at - 60000){
+    const resp = await fetch(XERO.proxyUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({grant_type:'refresh_token', refresh_token:token.refresh_token}),
+    });
+    if(!resp.ok){ xeroClearToken(); throw new Error('NOT_AUTHED'); }
+    token = await resp.json();
+    if(token.error){ xeroClearToken(); throw new Error('NOT_AUTHED'); }
+    token.expires_at = Date.now() + token.expires_in * 1000;
+    xeroSaveToken(token);
+  }
+  return token;
+}
+
+// ── Step 4: Get tenant (organisation) ID ──
+async function xeroGetOrg(accessToken){
+  const r = await fetch('https://api.xero.com/connections',{
+    headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'}
+  });
+  const orgs = await r.json();
+  if(!orgs.length) throw new Error('No Xero organisations found on this account.');
+  // Use first org (most businesses only have one)
+  xeroSaveTenant(orgs[0].tenantId);
+  return orgs[0].tenantId;
+}
+
+// ── Xero API helper ──
+async function xeroAPI(method, path, body){
+  const token   = await xeroEnsureToken();
+  let tenantId  = xeroGetTenant();
+  if(!tenantId) tenantId = await xeroGetOrg(token.access_token);
+
+  const opts = {
+    method,
+    headers:{
+      'Authorization':'Bearer '+token.access_token,
+      'Xero-tenant-id': tenantId,
+      'Content-Type':'application/json',
+      'Accept':'application/json',
+    },
+  };
+  if(body) opts.body = JSON.stringify(body);
+  const r = await fetch(XERO.apiBase+path, opts);
+  if(!r.ok){
+    const txt = await r.text();
+    throw new Error(`Xero API error ${r.status}: ${txt}`);
+  }
+  return r.json();
+}
+
+// ── Upsert Contact ──
+async function xeroUpsertContact(d){
+  const contact = {
+    Name:         d.company || d.name,
+    FirstName:    d.name.split(' ')[0],
+    LastName:     d.name.split(' ').slice(1).join(' '),
+    EmailAddress: d.email || undefined,
+    Phones: d.phone ? [{PhoneType:'DEFAULT',PhoneNumber:d.phone}] : [],
+  };
+  // Check if contact exists by name
+  const search = await xeroAPI('GET',`/Contacts?where=Name="${(d.company||d.name).replace(/"/g,'')}"`);
+  if(search.Contacts?.length){
+    const id = search.Contacts[0].ContactID;
+    await xeroAPI('POST','/Contacts',{Contacts:[{...contact,ContactID:id}]});
+    return id;
+  } else {
+    const res = await xeroAPI('POST','/Contacts',{Contacts:[contact]});
+    return res.Contacts[0].ContactID;
+  }
+}
+
+// ── Create/update Quote ──
+async function xeroUpsertQuote(d, contactId){
+  if(!d.quo && !d.value) return null;
+  const quote = {
+    Contact:    {ContactID: contactId},
+    Status:     'DRAFT',
+    Date:       d.movedate || new Date().toISOString().split('T')[0],
+    ExpiryDate: d.deliverydate || undefined,
+    QuoteNumber: d.quo ? 'QUO-'+d.quo : undefined,
+    LineItems: [{
+      Description: `Moving service: ${d.from||''} → ${d.to||''}`,
+      Quantity:    1,
+      UnitAmount:  +d.value || 0,
+      AccountCode: '200',
+    }],
+    CurrencyCode: 'ZAR',
+  };
+  const res = await xeroAPI('POST','/Quotes',{Quotes:[quote]});
+  return res.Quotes?.[0]?.QuoteID;
+}
+
+// ── Create Invoice (when Won) ──
+async function xeroCreateInvoice(d, contactId){
+  const payStatus = d.payment==='Fully Paid'?'PAID': d.payment==='Deposit Paid'?'AUTHORISED':'DRAFT';
+  const inv = {
+    Type:        'ACCREC',
+    Contact:     {ContactID: contactId},
+    Status:      payStatus==='PAID'?'AUTHORISED':payStatus,
+    InvoiceNumber: d.inv ? 'INV-'+d.inv : undefined,
+    Date:        d.deliverydate || new Date().toISOString().split('T')[0],
+    DueDate:     d.deliverydate || new Date().toISOString().split('T')[0],
+    LineItems: [{
+      Description: `Moving service: ${d.from||''} → ${d.to||''}${d.packing?'\nPacking: '+d.packing:''}`,
+      Quantity:    1,
+      UnitAmount:  +d.value || 0,
+      AccountCode: '200',
+    }],
+    CurrencyCode: 'ZAR',
+  };
+  const res = await xeroAPI('POST','/Invoices',{Invoices:[inv]});
+  return res.Invoices?.[0]?.InvoiceID;
+}
+
+// ── Main sync button handler ──
+async function syncXero(){
+  const d = deals.find(x=>x.id===currentDealId);
+  if(!d) return;
+  const btn = document.getElementById('xeroBtn');
+
+  // Show toast helper
+  function toast(msg,color='#0db465'){
+    const t=document.createElement('div');
+    t.style.cssText=`position:fixed;bottom:24px;right:24px;background:${color};color:white;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.4);`;
+    t.textContent=msg; document.body.appendChild(t);
+    setTimeout(()=>t.remove(),3500);
+  }
+
+  try {
+    btn.innerHTML='⏳ Connecting…'; btn.style.pointerEvents='none';
+
+    // Authenticate if needed
+    let token = xeroGetToken();
+    if(!token){
+      toast('Opening Xero login…','#2563eb');
+      const code = await xeroLogin();
+      token = await xeroExchangeCode(code);
+      toast('✓ Xero connected!');
+    }
+
+    btn.innerHTML='⏳ Syncing contact…';
+    const contactId = await xeroUpsertContact(d);
+
+    btn.innerHTML='⏳ Syncing quote…';
+    await xeroUpsertQuote(d, contactId);
+
+    if(d.stage==='won'){
+      btn.innerHTML='⏳ Creating invoice…';
+      await xeroCreateInvoice(d, contactId);
+    }
+
+    d.xeroLinked = true;
+    d.xeroContactId = contactId;
+    btn.innerHTML='✓ Linked to Xero'; btn.classList.add('linked');
+    btn.style.pointerEvents='auto';
+    toast(`✓ ${d.name} synced to Xero`);
+
+  } catch(err){
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="#0db465"><circle cx="12" cy="12" r="10"/><text x="6" y="16" font-size="12" fill="white" font-family="Arial" font-weight="bold">X</text></svg> Sync to Xero';
+    btn.style.pointerEvents='auto';
+    if(err.message==='NOT_AUTHED'){
+      xeroClearToken();
+      toast('Session expired — please sync again to re-login','#f59e0b');
+    } else {
+      console.error('Xero sync error:',err);
+      toast('Xero error: '+err.message,'#ef4444');
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUTO-POPULATE CLIENTS MOVED
+// ═══════════════════════════════════════════════════════════════
+
+function autoPopulate(d){
+  // In production: calls Google Apps Script Web App URL to append a row
+  // Apps Script: SpreadsheetApp.openById(SHEET_ID).getSheetByName('Clients Moved 2026').appendRow([...])
+  console.log('Auto-populate Clients Moved 2026:', d);
+  setTimeout(()=>{
+    if(d.stage==='won')
+      alert(`✓ "${d.name}" marked WON!\n\nAuto-added to "Clients Moved 2026":\n` +
+        `REF: ${d.quo||'?'} · INV: ${d.inv||'?'}\n` +
+        `Transporter: ${d.transporter||'?'}\n` +
+        `Load: ${d.from||'?'} → Deliver: ${d.to||'?'}\n` +
+        `Price: ${zar(d.value)} · Cost: ${zar(d.cost)} · Profit: ${zar((+d.value||0)-(+d.cost||0))}\n\n` +
+        `(Activate: paste your Apps Script URL into SHEETS_WEBHOOK in the code)`);
+  },300);
+}
+
+const SHEETS_WEBHOOK = 'YOUR_APPS_SCRIPT_WEB_APP_URL'; // replace to activate
+
+// ═══════════════════════════════════════════════════════════════
+// PRINT
+// ═══════════════════════════════════════════════════════════════
+
+function printJobSheet(){
+  const d=deals.find(x=>x.id===currentDealId);
+  if(!d)return;
+  const area=document.getElementById('printArea');
+  area.innerHTML=`<div style="max-width:580px;margin:0 auto;font-size:13px;">
+    <div style="text-align:right;font-size:11px;color:#666;margin-bottom:8px;">AFR Moves · Job Sheet · ${new Date().toLocaleDateString('en-ZA')}</div>
+    <h2 style="margin-bottom:16px;">SHUTTLE: ${d.shuttle}</h2>
+    <table style="width:100%;border-collapse:collapse;border:1px solid #ccc;">
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;width:160px;">CLIENT:</td><td style="padding:6px 8px;border:1px solid #ccc;">${d.name}<br>${d.phone}${d.email?'<br>'+d.email:''}</td></tr>
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">VOLUME:</td><td style="padding:6px 8px;border:1px solid #ccc;">${d.volume||'—'}</td></tr>
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">FROM:</td><td style="padding:6px 8px;border:1px solid #ccc;">${d.from||'—'}${d.shuttle_from_who?'<br><em>Shuttle: '+d.shuttle_from_who+' '+d.shuttle_from_note+'</em>':''}</td></tr>
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">TO:</td><td style="padding:6px 8px;border:1px solid #ccc;">${d.to||'—'}${d.shuttle_to_who?'<br><em>Shuttle: '+d.shuttle_to_who+' '+d.shuttle_to_note+'</em>':''}</td></tr>
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">DATE OF MOVE:</td><td style="padding:6px 8px;border:1px solid #ccc;">Load: ${fmtDate(d.movedate)||'—'}</td></tr>
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">PACKING:</td><td style="padding:6px 8px;border:1px solid #ccc;">${d.packing||'None'}</td></tr>
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">INSURANCE:</td><td style="padding:6px 8px;border:1px solid #ccc;">${d.insurance}${d.insurance==='Yes'&&d.insurance_amt?' · R'+Number(d.insurance_amt).toLocaleString():''}</td></tr>
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">STORAGE:</td><td style="padding:6px 8px;border:1px solid #ccc;">${d.storage}</td></tr>
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">REDELIVERY:</td><td style="padding:6px 8px;border:1px solid #ccc;">${d.redelivery}</td></tr>
+      <tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">PAYMENT:</td><td style="padding:6px 8px;border:1px solid #ccc;">${zar(d.value)||'—'} · ${d.payment||'—'}</td></tr>
+      ${d.notes?`<tr><td style="padding:6px 8px;font-weight:bold;border:1px solid #ccc;">NOTES:</td><td style="padding:6px 8px;border:1px solid #ccc;">${d.notes}</td></tr>`:''}
+    </table>
+    <div style="margin-top:14px;font-size:11px;color:#666;">Transporter: ${d.transporter||'—'} · QUO: ${d.quo||'—'} · INV: ${d.inv||'—'}</div>
+  </div>`;
+  window.print();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+
+function showView(v,tabEl){
+  activeView=v;
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  if(tabEl)tabEl.classList.add('active');
+  document.getElementById('leadsView').style.display='none';
+  document.getElementById('boardView').style.display='none';
+  document.getElementById('listViewEl').style.display='none';
+  document.getElementById('pipelineBar').style.display=v==='leads'?'none':'flex';
+  if(v==='leads'){document.getElementById('leadsView').style.display='flex';renderLeads();}
+  else if(v==='pipeline'){document.getElementById('boardView').style.display='flex';renderBoard();}
+  else if(v==='listview'){document.getElementById('listViewEl').style.display='flex';renderList();}
+}
+
+function switchPipeline(p,btn){
+  curPipeline=p;
+  document.querySelectorAll('.pipeline-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(curBoardView==='board')renderBoard();else renderList();
+}
+
+function setBoardView(v){
+  curBoardView=v;
+  document.getElementById('boardBtn').classList.toggle('active',v==='board');
+  document.getElementById('listBtn').classList.toggle('active',v==='list');
+  if(v==='board'){
+    document.getElementById('board').style.display='flex';
+    document.getElementById('listViewEl').style.display='none';
+    document.getElementById('boardView').style.display='flex';
+    renderBoard();
+  } else {
+    document.getElementById('boardView').style.display='none';
+    document.getElementById('listViewEl').style.display='flex';
+    renderList();
+  }
+}
+
+function updatePipeTotal(){
+  const d=deals.filter(x=>x.pipeline===curPipeline&&x.stage!=='won'&&x.stage!=='lost');
+  const t=d.reduce((s,x)=>s+(+x.value||0),0);
+  document.getElementById('pipeTotal').textContent=`${d.length} active · ${zar(t)}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PARTNERS / TRANSPORTER
+// ═══════════════════════════════════════════════════════════════
+
+function buildTransporterDropdown(selectedValue){
+  const sel = document.getElementById('f_transporter');
+  // Keep first two options (blank + own truck + divider)
+  sel.innerHTML = `
+    <option value="">Select...</option>
+    <option value="__own__">🚛 Own Truck / Driver</option>
+    <option disabled>──────────────</option>
+    ${partners.map(p=>`<option value="${p}"${p===selectedValue?' selected':''}>${p}</option>`).join('')}
+    <option value="__custom__"${selectedValue==='__custom__'?' selected':''}>✏️ Other (type below)</option>
+  `;
+  if(selectedValue && selectedValue !== '__own__' && selectedValue !== '__custom__' && !partners.includes(selectedValue)){
+    // It's a custom value saved previously
+    sel.value = '__custom__';
+    document.getElementById('transporterCustomWrap').style.display = 'block';
+    document.getElementById('f_transporter_custom').value = selectedValue;
+  } else {
+    sel.value = selectedValue || '';
+  }
+}
+
+function transporterSelectChange(val){
+  document.getElementById('transporterCustomWrap').style.display = val==='__custom__' ? 'block' : 'none';
+  document.getElementById('ownTruckWrap').style.display = val==='__own__' ? 'block' : 'none';
+}
+
+function getTransporterValue(){
+  const sel = document.getElementById('f_transporter');
+  const val = sel.value;
+  if(val === '__custom__') return document.getElementById('f_transporter_custom').value.trim();
+  if(val === '__own__'){
+    const driver = document.getElementById('f_own_driver').value.trim();
+    return driver ? 'Own Truck — ' + driver : 'Own Truck';
+  }
+  return val;
+}
+
+function openAddPartner(){
+  renderPartnerList();
+  document.getElementById('newPartnerName').value = '';
+  document.getElementById('partnerModalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('newPartnerName').focus(), 100);
+}
+
+function closePartnerModal(){
+  document.getElementById('partnerModalOverlay').classList.remove('open');
+  // Silently rebuild dropdown in the deal modal behind it
+  const current = getTransporterValue();
+  buildTransporterDropdown(current);
+  // Don't touch the deal modal — it stays open
+}
+
+function addPartner(){
+  const name = document.getElementById('newPartnerName').value.trim();
+  if(!name) return;
+  if(partners.includes(name)){ 
+    document.getElementById('newPartnerName').value = '';
+    return; 
+  }
+  partners.push(name);
+  partners.sort((a,b)=>a.localeCompare(b));
+  document.getElementById('newPartnerName').value = '';
+  renderPartnerList();
+}
+
+function removePartner(name){
+  if(!confirm(`Remove "${name}" from partners?`)) return;
+  partners = partners.filter(p=>p!==name);
+  renderPartnerList();
+}
+
+function renderPartnerList(){
+  const el = document.getElementById('partnerList');
+  if(!partners.length){
+    el.innerHTML = '<div style="color:var(--text3);font-size:12px;">No partners yet</div>';
+    return;
+  }
+  el.innerHTML = partners.map(p=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:5px;">
+      <span style="font-size:13px;color:var(--text);">🚛 ${p}</span>
+      <button onclick="removePartner('${p.replace(/'/g,"\\'")}')" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;">Remove</button>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+
+renderBoard();
+renderCallList();
+
+// Only show call banner between 14:50–15:30, but forced on for demo
+const h=new Date().getHours(),m=new Date().getMinutes();
+const showBanner=(h===14&&m>=50)||(h===15&&m<=30);
+// Force show for demo — remove this line in production:
+document.getElementById('alertBanner').style.display='flex';
+</script>
+</body>
+</html>
