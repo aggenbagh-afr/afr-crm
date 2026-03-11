@@ -395,10 +395,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
       <div class="modal-subtitle" id="modalSubtitle"></div>
     </div>
     <div class="modal-header-actions">
-      <button class="xero-btn" id="xeroBtn" onclick="syncXero()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="#0db465"><circle cx="12" cy="12" r="10"/><text x="6" y="16" font-size="12" fill="white" font-family="Arial" font-weight="bold">X</text></svg>
-        Sync to Xero
-      </button>
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
   </div>
@@ -658,9 +654,34 @@ const POST = [
 
 const ALL_STAGES = [...PRE, ...POST];
 
+// ═══════════════════════════════════════════════════════════════
+// PERSISTENCE — localStorage
+// ═══════════════════════════════════════════════════════════════
+
+const STORE = {
+  save(){
+    localStorage.setItem('afr_deals',    JSON.stringify(deals));
+    localStorage.setItem('afr_leads',    JSON.stringify(leads));
+    localStorage.setItem('afr_partners', JSON.stringify(partners));
+    localStorage.setItem('afr_reminders',JSON.stringify(callReminders));
+  },
+  load(){
+    try {
+      const d = localStorage.getItem('afr_deals');
+      const l = localStorage.getItem('afr_leads');
+      const p = localStorage.getItem('afr_partners');
+      const r = localStorage.getItem('afr_reminders');
+      if(d) deals        = JSON.parse(d);
+      if(l) leads        = JSON.parse(l);
+      if(p) partners     = JSON.parse(p);
+      if(r) callReminders= JSON.parse(r);
+    } catch(e){ console.warn('Storage load error',e); }
+  }
+};
+
 let partners = [
   'Key Moves','H&M','H&M / TAC','Moving24','Mountain View',
-  'Magic','Magic Movers','Intertrans','TAC','Jippie Vervoer'
+  'Magic Movers','Intertrans','TAC','Jippie Vervoer'
 ];
 
 let curPipeline = 'pre';
@@ -745,6 +766,7 @@ function renderCallList(){
 
 function dismissCall(id){
   callReminders=callReminders.filter(c=>c.id!==id);
+  STORE.save();
   renderCallList();
 }
 
@@ -759,7 +781,7 @@ function renderBoard(){
 
   stages.forEach(stage=>{
     const visible=stage.id!=='won'&&stage.id!=='lost';
-    const stageDeals=deals.filter(d=>d.stage===stage.id&&d.pipeline===curPipeline);
+    const stageDeals=deals.filter(d=>!d.archived&&d.stage===stage.id&&d.pipeline===curPipeline);
     const visibleDeals=visible?stageDeals:[];
     const total=stageDeals.reduce((s,d)=>s+(+d.value||0),0);
 
@@ -795,8 +817,9 @@ function renderBoard(){
       ${visible?`
       <div class="col-cards" id="cards-${stage.id}"
         ondragover="event.preventDefault();this.closest('.col').classList.add('drag-over')"
-        ondragleave="this.closest('.col').classList.remove('drag-over')"
-        ondrop="dropCard(event,'${stage.id}')">
+        ondragleave="e=>{if(!this.closest('.col').contains(e.relatedTarget))this.closest('.col').classList.remove('drag-over')}"
+        ondrop="dropCard(event,'${stage.id}')"
+        style="min-height:80px;">
         ${visibleDeals.map(d=>cardHTML(d)).join('')}
       </div>`:`
       <div class="won-lost-section">
@@ -833,7 +856,8 @@ function cardHTML(d){
   const bcHtml=pipeStages.map(s=>`<span class="bc-step${s.id===d.stage?' current':''}">${s.label.split(' ')[0]}</span>${s.id!==pipeStages[pipeStages.length-1].id?'<span class="bc-sep">›</span>':''}`).join('');
 
   return `<div class="card" draggable="true" data-id="${d.id}"
-    ondragstart="window._dragId=${d.id}"
+    ondragstart="event.dataTransfer.setData('text/plain',String(${d.id}));window._dragId=${d.id};this.style.opacity='.4'"
+    ondragend="this.style.opacity='1';document.querySelectorAll('.col').forEach(c=>c.classList.remove('drag-over'))"
     onclick="openDeal(${d.id})">
     <div class="card-breadcrumb">${bcHtml}</div>
     ${d.company?`<div class="card-company">${d.company}</div>`:''}
@@ -856,13 +880,14 @@ function cardHTML(d){
 function dropCard(e,stageId){
   e.preventDefault();
   document.querySelectorAll('.col').forEach(c=>c.classList.remove('drag-over'));
-  const id=window._dragId;if(!id)return;
+  const id=window._dragId; if(!id)return;
   const d=deals.find(x=>x.id===id);
   if(!d)return;
   d.stage=stageId;
-  if(POST.find(s=>s.id===stageId))d.pipeline='post';
+  if(POST.find(s=>s.id===stageId))d.pipeline='post'; else d.pipeline='pre';
   if(stageId==='won')autoPopulate(d);
   window._dragId=null;
+  STORE.save();
   renderBoard();
 }
 
@@ -973,20 +998,25 @@ function saveLead(){
     });
   }
   closeLeadModal();
+  STORE.save();
   renderLeads();
 }
 
 function deleteLead(){
   if(!currentLeadId) return;
-  if(!confirm('Permanently delete this lead?')) return;
-  leads = leads.filter(x=>x.id !== currentLeadId);
+  if(!confirm('Archive this lead? It can still be found via search.')) return;
+  const l = leads.find(x=>x.id===currentLeadId);
+  if(l){ l.archived=true; l.lost=true; }
   closeLeadModal();
+  STORE.save();
   renderLeads();
 }
 
 function confirmDeleteLead(id){
-  if(!confirm('Permanently delete this lead?')) return;
-  leads = leads.filter(x=>x.id !== id);
+  if(!confirm('Archive this lead? It can still be found via search.')) return;
+  const l = leads.find(x=>x.id===id);
+  if(l){ l.archived=true; l.lost=true; }
+  STORE.save();
   renderLeads();
 }
 
@@ -996,18 +1026,19 @@ function qualifyLead(id){
   const nd=mk(Date.now(),l.name,'quote_request','pre',{phone:l.phone,source:l.source,from:l.from,to:l.to});
   deals.push(nd);
   leads=leads.filter(x=>x.id!==id);
+  STORE.save();
   renderLeads();
   alert(`✓ ${l.name} moved to Pre-Booking → Quote Request`);
 }
 
 function loseLead(id){
   const l=leads.find(x=>x.id===id);
-  if(l){l.lost=true;renderLeads();}
+  if(l){l.lost=true; STORE.save(); renderLeads();}
 }
 
 function restoreLead(id){
   const l=leads.find(x=>x.id===id);
-  if(l){l.lost=false;renderLeads();}
+  if(l){l.lost=false; l.archived=false; STORE.save(); renderLeads();}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1046,17 +1077,37 @@ function doSearch(q){
   const res=document.getElementById('searchResults');
   if(!q.trim()){res.classList.remove('open');return;}
   const ql=q.toLowerCase();
-  const active=deals.filter(d=>d.stage!=='won'&&d.stage!=='lost'&&(d.name.toLowerCase().includes(ql)||d.company.toLowerCase().includes(ql)||d.phone.toLowerCase().includes(ql)));
-  const won=deals.filter(d=>d.stage==='won'&&(d.name.toLowerCase().includes(ql)||d.company.toLowerCase().includes(ql)));
-  const lost=deals.filter(d=>d.stage==='lost'&&(d.name.toLowerCase().includes(ql)||d.company.toLowerCase().includes(ql)));
-  const leadRes=leads.filter(l=>l.name.toLowerCase().includes(ql)||l.phone.toLowerCase().includes(ql));
+
+  function matchDeal(d){
+    return [d.name,d.company,d.phone,d.phone2,d.email,d.email2,d.quo,d.inv,d.from,d.to]
+      .some(v=>v&&v.toLowerCase().includes(ql));
+  }
+  function matchLead(l){
+    return [l.name,l.phone,l.from,l.to,l.source]
+      .some(v=>v&&v.toLowerCase().includes(ql));
+  }
+
+  const active  = deals.filter(d=>!d.archived&&d.stage!=='won'&&d.stage!=='lost'&&matchDeal(d));
+  const won     = deals.filter(d=>d.stage==='won'&&matchDeal(d));
+  const lost    = deals.filter(d=>d.stage==='lost'&&matchDeal(d));
+  const archived= deals.filter(d=>d.archived&&matchDeal(d));
+  const leadRes = leads.filter(l=>!l.archived&&matchLead(l));
+  const archLeads=leads.filter(l=>l.archived&&matchLead(l));
+
+  const dealRow=(d,badge='')=>`
+    <div class="search-item" onclick="openDeal(${d.id});closeSearch()">
+      <div class="search-item-name">${d.company?`<span style="font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.5px;">${d.company} · </span>`:''}${d.name} ${badge}</div>
+      <div class="search-item-meta">${stageLabel(d.stage)}${d.quo?' · QUO '+d.quo:''}${d.inv?' · INV '+d.inv:''}${d.movedate?' · '+fmtDate(d.movedate):''}</div>
+    </div>`;
 
   let html='';
-  if(leadRes.length){html+=`<div class="search-group-label">Leads</div>`;html+=leadRes.map(l=>`<div class="search-item" onclick="showView('leads',document.querySelector('.nav-tab'));closeSearch()"><div class="search-item-name">${l.name}</div><div class="search-item-meta">${l.phone} · ${l.source}</div></div>`).join('');}
-  if(active.length){html+=`<div class="search-group-label">Active Deals</div>`;html+=active.map(d=>`<div class="search-item" onclick="openDeal(${d.id});closeSearch()"><div class="search-item-name">${d.company?d.company+' · ':''}${d.name}</div><div class="search-item-meta">${stageLabel(d.stage)} · ${d.transporter||'No transporter'}</div></div>`).join('');}
-  if(won.length){html+=`<div class="search-group-label">Won</div>`;html+=won.map(d=>`<div class="search-item" onclick="openDeal(${d.id});closeSearch()"><div class="search-item-name">${d.name}</div><div class="search-item-meta">Won · ${fmtDate(d.deliverydate)}</div></div>`).join('');}
-  if(lost.length){html+=`<div class="search-group-label">Lost</div>`;html+=lost.map(d=>`<div class="search-item" onclick="openDeal(${d.id});closeSearch()"><div class="search-item-name">${d.name}</div><div class="search-item-meta">Lost · ${fmtDate(d.deliverydate)}</div></div>`).join('');}
-  if(!html)html='<div style="padding:12px 14px;font-size:12px;color:var(--text3);">No results found</div>';
+  if(leadRes.length){ html+=`<div class="search-group-label">Leads</div>`; html+=leadRes.map(l=>`<div class="search-item" onclick="showView('leads',document.querySelector('.nav-tab'));closeSearch()"><div class="search-item-name">${l.name}</div><div class="search-item-meta">${l.phone||''}${l.source?' · '+l.source:''}</div></div>`).join('');}
+  if(active.length){ html+=`<div class="search-group-label">Active Deals</div>`; html+=active.map(d=>dealRow(d)).join('');}
+  if(won.length){    html+=`<div class="search-group-label">Won</div>`;           html+=won.map(d=>dealRow(d,'<span style="color:var(--green);font-size:10px;">✓ WON</span>')).join('');}
+  if(lost.length){   html+=`<div class="search-group-label">Lost</div>`;          html+=lost.map(d=>dealRow(d,'<span style="color:var(--red);font-size:10px;">✗ LOST</span>')).join('');}
+  if(archived.length){html+=`<div class="search-group-label">Archived Deals</div>`;html+=archived.map(d=>dealRow(d,'<span style="color:var(--text3);font-size:10px;">ARCHIVED</span>')).join('');}
+  if(archLeads.length){html+=`<div class="search-group-label">Archived Leads</div>`;html+=archLeads.map(l=>`<div class="search-item" onclick="closeSearch()"><div class="search-item-name">${l.name} <span style="color:var(--text3);font-size:10px;">ARCHIVED</span></div><div class="search-item-meta">${l.phone||''}${l.source?' · '+l.source:''}</div></div>`).join('');}
+  if(!html) html='<div style="padding:12px 14px;font-size:12px;color:var(--text3);">No results — try a name, phone, email, QUO or INV ref</div>';
   res.innerHTML=html;
   res.classList.add('open');
 }
@@ -1235,14 +1286,17 @@ function saveDeal(){
   d.stage=document.getElementById('stageDropdown').value;
   if(POST.find(s=>s.id===d.stage))d.pipeline='post';else d.pipeline='pre';
   closeModal();
+  STORE.save();
   if(activeView==='pipeline')renderBoard();
   else if(activeView==='listview')renderList();
 }
 
 function deleteDeal(){
-  if(!confirm('Delete this deal permanently?'))return;
-  deals=deals.filter(x=>x.id!==currentDealId);
+  if(!confirm('Archive this deal? It will no longer appear in the pipeline but can still be found via search.'))return;
+  const d=deals.find(x=>x.id===currentDealId);
+  if(d){ d.stage='archived'; d.archived=true; }
   closeModal();
+  STORE.save();
   renderBoard();
 }
 
@@ -1365,7 +1419,7 @@ const XERO = {
   clientId:    '6AC6CAE068864131AB95991E05CA5730',
   clientSecret:'7uesOqxOwzqDXdw7B52061glIzCkucVQqMjMtyWZkH4BxVcR',
   proxyUrl:    'https://script.google.com/macros/s/AKfycbz52uVQPx26y2JTLukQesd9gVr6RlRCMFYfMcS2EcwUhJ9fZRPNjMihsbWMlt70ZI2U/exec',
-  redirectUri: 'https://marvelous-pika-664853.netlify.app/xero-callback.html',
+  redirectUri: 'https://africanfurnitureremovals.co.za/crm/xero-callback.html',
   scopes:      'openid profile email accounting.contacts accounting.transactions',
   authEndpoint:'https://login.xero.com/identity/connect/authorize',
   tokenEndpoint:'https://identity.xero.com/connect/token',
@@ -1776,12 +1830,14 @@ function addPartner(){
   partners.push(name);
   partners.sort((a,b)=>a.localeCompare(b));
   document.getElementById('newPartnerName').value = '';
+  STORE.save();
   renderPartnerList();
 }
 
 function removePartner(name){
   if(!confirm(`Remove "${name}" from partners?`)) return;
   partners = partners.filter(p=>p!==name);
+  STORE.save();
   renderPartnerList();
 }
 
@@ -1803,14 +1859,16 @@ function renderPartnerList(){
 // INIT
 // ═══════════════════════════════════════════════════════════════
 
+// Load saved data — overwrites sample data if user has saved records
+STORE.load();
+
 renderBoard();
 renderCallList();
 
-// Only show call banner between 14:50–15:30, but forced on for demo
+// Show call banner between 14:50–15:30
 const h=new Date().getHours(),m=new Date().getMinutes();
 const showBanner=(h===14&&m>=50)||(h===15&&m<=30);
-// Force show for demo — remove this line in production:
-document.getElementById('alertBanner').style.display='flex';
+if(showBanner) document.getElementById('alertBanner').style.display='flex';
 </script>
 </body>
 </html>
