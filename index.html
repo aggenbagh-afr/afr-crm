@@ -671,10 +671,17 @@ const STORE = {
       const l = localStorage.getItem('afr_leads');
       const p = localStorage.getItem('afr_partners');
       const r = localStorage.getItem('afr_reminders');
-      if(d) deals        = JSON.parse(d);
-      if(l) leads        = JSON.parse(l);
-      if(p) partners     = JSON.parse(p);
-      if(r) callReminders= JSON.parse(r);
+      // Only overwrite sample data if localStorage actually has saved records
+      if(d) deals         = JSON.parse(d);
+      if(l) leads         = JSON.parse(l);
+      if(p) partners      = JSON.parse(p);
+      if(r) callReminders = JSON.parse(r);
+      // If this is first ever visit (no deals saved), keep sample data but mark as loaded
+      // so ghost cards from empty mk() calls don't appear
+      if(d){
+        // Filter out any blank ghost deals that may have been accidentally saved
+        deals = deals.filter(x => x.name && x.name.trim() !== '');
+      }
     } catch(e){ console.warn('Storage load error',e); }
   }
 };
@@ -781,7 +788,7 @@ function renderBoard(){
 
   stages.forEach(stage=>{
     const visible=stage.id!=='won'&&stage.id!=='lost';
-    const stageDeals=deals.filter(d=>!d.archived&&d.stage===stage.id&&d.pipeline===curPipeline);
+    const stageDeals=deals.filter(d=>!d.archived&&d.name&&d.name.trim()!==''&&d.stage===stage.id&&d.pipeline===curPipeline);
     const visibleDeals=visible?stageDeals:[];
     const total=stageDeals.reduce((s,d)=>s+(+d.value||0),0);
 
@@ -1204,12 +1211,22 @@ function openDealByName(name){
 }
 
 function openNewDeal(){
-  const nd=mk(Date.now(),'',curPipeline==='pre'?'quote_request':'ready_to_book',curPipeline);
+  const stage = curPipeline==='pre' ? 'quote_request' : 'ready_to_book';
+  const nd = mk(Date.now(), '', stage, curPipeline);
   deals.push(nd);
+  STORE.save();
   openDeal(nd.id);
 }
 
 function closeModal(){
+  // If the current deal has no name (was just created via + New Deal but cancelled), remove it
+  if(currentDealId){
+    const d = deals.find(x=>x.id===currentDealId);
+    if(d && (!d.name || d.name.trim()==='')){
+      deals = deals.filter(x=>x.id!==currentDealId);
+      STORE.save();
+    }
+  }
   document.getElementById('modalOverlay').classList.remove('open');
   currentDealId=null;
 }
