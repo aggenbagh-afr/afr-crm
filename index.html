@@ -2228,7 +2228,10 @@ function buildQuoteCard(q){
   card.dataset.qid = q.id;
 
   // Build partner name dropdown options
-  const opts = (Array.isArray(partners)?partners:[]).map(p =>
+  const PRIO=['Key Moves','H&M','Intertrans','Mountain View','Magic Movers','Multi Trans'];
+  const ps=Array.isArray(partners)?partners:[];
+  const sortedPs=[...PRIO.filter(p=>ps.includes(p)),...ps.filter(p=>!PRIO.includes(p)).sort((a,b)=>a.localeCompare(b))];
+  const opts = sortedPs.map(p =>
     `<option value="${p}" ${p===q.partner?'selected':''}>${p}</option>`
   ).join('');
 
@@ -2284,6 +2287,12 @@ function toggleWinner(btn){
   // Select this card
   thisCard.classList.add('winner');
   btn.textContent = '🏆 Selected';
+  // Auto-fill transporter in Job Details
+  const winnerName = thisCard.querySelector('.pq-name-input')?.value;
+  if(winnerName && winnerName !== '__custom__' && winnerName !== '__own__'){
+    const tSel = document.getElementById('f_transporter');
+    if(tSel){ tSel.value = winnerName; transporterSelectChange(winnerName); }
+  }
   thisCard.querySelector('.pq-our-quote').style.display = 'flex';
   thisCard.querySelector('.pq-our-quote').style.flexDirection = 'column';
   thisCard.querySelector('.pq-our-quote').style.gap = '4px';
@@ -2355,6 +2364,14 @@ function addCostLine(){
   STORE.saveDeal(d);
 }
 
+function editCostLine(idx, field, value){
+  const d = deals.find(x=>x.id===currentDealId);
+  if(!d||!d.costLines||!d.costLines[idx]) return;
+  d.costLines[idx][field] = field==='amt' ? parseFloat(value)||0 : value;
+  renderCostLines(d);
+  STORE.saveDeal(d);
+}
+
 function removeCostLine(idx){
   const d = deals.find(x=>x.id===currentDealId);
   if(!d) return;
@@ -2369,9 +2386,13 @@ function renderCostLines(d){
   if(!wrap) return;
   const lines = d.costLines||[];
   wrap.innerHTML = lines.map((l,i)=>`
-    <div style="display:flex;align-items:center;gap:6px;background:var(--surface3);border-radius:var(--radius-sm);padding:5px 8px;">
-      <span style="flex:1;font-size:12px;color:var(--text2);">${l.desc||'—'}</span>
-      <span style="font-size:12px;font-weight:600;color:var(--text2);">R${Number(l.amt).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+    <div style="display:flex;align-items:center;gap:6px;background:var(--surface3);border-radius:var(--radius-sm);padding:4px 8px;">
+      <input value="${(l.desc||'').replace(/"/g,'&quot;')}" onchange="editCostLine(${i},'desc',this.value)"
+        style="flex:1;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--text2);font-size:12px;font-family:'DM Sans',sans-serif;padding:2px 4px;outline:none;min-width:0;"
+        onfocus="this.style.borderBottomColor='var(--accent)'" onblur="this.style.borderBottomColor='transparent'">
+      <input type="number" value="${l.amt}" onchange="editCostLine(${i},'amt',this.value)"
+        style="width:90px;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;font-weight:600;padding:2px 4px;outline:none;text-align:right;"
+        onfocus="this.style.borderBottomColor='var(--accent)'" onblur="this.style.borderBottomColor='transparent'">
       <button onclick="removeCostLine(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:0 2px;line-height:1;">×</button>
     </div>`).join('');
   const total = lines.reduce((s,l)=>s+l.amt,0);
@@ -2400,6 +2421,7 @@ function renderQuotes(quotes, selIdx){
     row.innerHTML='<button onclick="selectQuote('+i+')" title="Use this quote in Reports" style="border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;background:'+(isSel?'#22c55e':'var(--surface3)')+';color:'+(isSel?'#fff':'var(--text3)')+';">'+(isSel?'✓ ACTIVE':'Select')+'</button>'
       +'<div style="font-size:12px;font-weight:600;color:var(--accent);min-width:72px;">'+label+'</div>'
       +'<input type="number" class="q-amt" placeholder="0.00" value="'+(q.amt||'')+'" oninput="updateFinancialSummaryFromQuotes()" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 9px;font-size:'+(isSel?'15px;font-weight:700;color:#22c55e':'12px;color:var(--text)')+';font-family:\'DM Sans\',sans-serif;">'
+      +'<input type="text" class="q-quo" placeholder="QUO#" value="'+(q.quo||'')+'" oninput="quoteQuoChanged(this,'+i+')" title="Quote reference number" style="width:72px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 8px;font-size:12px;color:var(--text);font-family:\'DM Mono\',monospace;">'
       +'<input type="date" class="q-date" value="'+(q.date||'')+'" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 8px;font-size:12px;color:var(--text);font-family:\'DM Sans\',sans-serif;">'
       +(i>0?'<button onclick="removeQuoteRow(this,'+i+')" style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 4px;">×</button>':'<span style="width:20px;"></span>');
     c.appendChild(row);
@@ -2414,8 +2436,27 @@ function selectQuote(idx){
   d.quotes=qs;
   d.selectedQuote=idx;
   d.value=qs[idx]?qs[idx].amt:'';
+  // Auto-fill QUO Ref if this quote has a number
+  if(qs[idx]&&qs[idx].quo){
+    var quoEl=document.getElementById('f_quo');
+    if(quoEl) quoEl.value=qs[idx].quo;
+  }
   renderQuotes(qs, idx);
   updateFinancialSummary();
+  STORE.saveDeal(d);
+}
+
+function quoteQuoChanged(input, idx){
+  var d=deals.find(function(x){return x.id===currentDealId;});
+  if(!d) return;
+  var qs=collectQuotes();
+  if(qs[idx]) qs[idx].quo=input.value;
+  d.quotes=qs;
+  // If this is the active quote, update QUO Ref field too
+  if(idx===(d.selectedQuote||0)){
+    var quoEl=document.getElementById('f_quo');
+    if(quoEl) quoEl.value=input.value;
+  }
   STORE.saveDeal(d);
 }
 
@@ -2446,6 +2487,7 @@ function collectQuotes(){
   return rows.map(function(r){
     return {
       amt: (r.querySelector('.q-amt')||{}).value||'',
+      quo: (r.querySelector('.q-quo')||{}).value||'',
       date:(r.querySelector('.q-date')||{}).value||''
     };
   });
@@ -3786,7 +3828,7 @@ function doSearch(q){
   const won     = deals.filter(d=>d.stage==='won'&&matchDeal(d));
   const lost    = deals.filter(d=>d.stage==='lost'&&matchDeal(d));
   const archived= deals.filter(d=>d.archived&&matchDeal(d));
-  const leadRes = leads.filter(l=>!l.archived&&matchLead(l));
+  const leadRes = leads.filter(l=>!l.archived&&!l.qualified&&matchLead(l));
   const archLeads=leads.filter(l=>l.archived&&matchLead(l));
 
   const dealRow=(d,badge='')=>`
@@ -3796,7 +3838,7 @@ function doSearch(q){
     </div>`;
 
   let html='';
-  if(leadRes.length){ html+=`<div class="search-group-label">Leads</div>`; html+=leadRes.map(l=>`<div class="search-item" onclick="showView('leads',document.querySelector('.nav-tab'));closeSearch()"><div class="search-item-name">${l.name}</div><div class="search-item-meta">${l.phone||''}${l.source?' · '+l.source:''}</div></div>`).join('');}
+  if(leadRes.length){ html+=`<div class="search-group-label">Leads</div>`; html+=leadRes.map(l=>`<div class="search-item" onclick="closeSearch();showView('leads',document.querySelector('.nav-tab[onclick*=leads]'));setTimeout(()=>openEditLead(${l.id}),150)"><div class="search-item-name">${l.name}</div><div class="search-item-meta">${l.phone||''}${l.source?' · '+l.source:''}</div></div>`).join('');}
   if(active.length){ html+=`<div class="search-group-label">Active Deals</div>`; html+=active.map(d=>dealRow(d)).join('');}
   if(won.length){    html+=`<div class="search-group-label">Won</div>`;           html+=won.map(d=>dealRow(d,'<span style="color:var(--green);font-size:10px;">✓ WON</span>')).join('');}
   if(lost.length){   html+=`<div class="search-group-label">Lost</div>`;          html+=lost.map(d=>dealRow(d,'<span style="color:var(--red);font-size:10px;">✗ LOST</span>')).join('');}
@@ -3995,6 +4037,8 @@ function openDealByName(name){
 function openNewDeal(){
   const stage = curPipeline==='pre' ? 'quote_request' : 'ready_to_book';
   const nd = mk(Date.now(), '', stage, curPipeline);
+  // Auto-seed Transport cost line
+  nd.costLines = [{desc:'Transport cost', amt:0}];
   deals.push(nd);
   // Push to Sheet immediately — ensures pullAll never treats this as an unknown deal
   STORE.saveDeal(nd);
@@ -5911,7 +5955,7 @@ function buildTransporterDropdown(selectedValue){
     <option value="">Select...</option>
     <option value="__own__">🚛 Own Truck / Driver</option>
     <option disabled>──────────────</option>
-    ${(Array.isArray(partners)?partners:[]).map(p=>`<option value="${p}"${p===selectedValue?' selected':''}>${p}</option>`).join('')}
+    ${(()=>{ const PRIO=['Key Moves','H&M','Intertrans','Mountain View','Magic Movers','Multi Trans']; const ps=Array.isArray(partners)?partners:[]; const top=PRIO.filter(p=>ps.includes(p)); const rest=ps.filter(p=>!PRIO.includes(p)).sort((a,b)=>a.localeCompare(b)); return [...top,...rest].map(p=>`<option value="${p}"${p===selectedValue?' selected':''}>${p}</option>`).join(''); })()}
     <option value="__custom__"${selectedValue==='__custom__'?' selected':''}>✏️ Other (type below)</option>
   `;
   if(selectedValue && selectedValue !== '__own__' && selectedValue !== '__custom__' && !(Array.isArray(partners) && partners.includes(selectedValue))){
@@ -5970,7 +6014,10 @@ function addPartner(){
   // Refresh partner dropdowns in open quote cards so new partner appears immediately
   document.querySelectorAll('.pq-name-input').forEach(sel=>{
     const current = sel.value;
-    const opts = (Array.isArray(partners)?partners:[]).map(p=>`<option value="${p}" ${p===current?'selected':''}>${p}</option>`).join('');
+    const PRIO2=['Key Moves','H&M','Intertrans','Mountain View','Magic Movers','Multi Trans'];
+    const ps2=Array.isArray(partners)?partners:[];
+    const sorted2=[...PRIO2.filter(p=>ps2.includes(p)),...ps2.filter(p=>!PRIO2.includes(p)).sort((a,b)=>a.localeCompare(b))];
+    const opts = sorted2.map(p=>`<option value="${p}" ${p===current?'selected':''}>${p}</option>`).join('');
     sel.innerHTML = '<option value="">Select partner…</option>' + opts;
     sel.value = current;
   });
@@ -6581,6 +6628,7 @@ function renderRptHeaders(){
     {key:'quo',        label:'REF'},
     {key:'inv',        label:'INV'},
     {key:'name',       label:'Client'},
+    {key:'payment',    label:'Payment'},
     {key:'transporter',label:'Transporter'},
     {key:'fromCity',   label:'Load'},
     {key:'toCity',     label:'Deliver'},
@@ -6683,6 +6731,7 @@ function renderReports(){
       return `<tr onclick="openDeal(${d.id})" style="cursor:pointer;">
         <td>${d.quo||'—'}</td><td>${d.inv||'—'}</td>
         <td style="font-weight:600;color:var(--text);">${d.name}</td>
+        <td style="text-align:center;font-size:14px;">${d.payment==='Fully Paid'?'🟢':d.payment==='Deposit Paid'?'🟡':'🔴'}</td>
         <td>${d.transporter||'—'}</td>
         <td>${d.fromCity||d.from||'—'}</td><td>${d.toCity||d.to||'—'}</td>
         <td style="color:var(--text3);">${fmtDate(d.bookedDate)||fmtDate(d.movedate)||'—'}</td>
@@ -6711,7 +6760,7 @@ function renderReports(){
     .map(x=>`${x.count} ${stageNames[x.s]}`)
     .join(' · ');
   tfoot.innerHTML = `<tr style="font-weight:700;border-top:2px solid var(--border2);">
-    <td colspan="8" style="color:var(--text3);font-size:11px;">TOTALS — ${wonDeals.length} deal${wonDeals.length!==1?'s':''} &nbsp;·&nbsp; ${stageCounts}</td>
+    <td colspan="10" style="color:var(--text3);font-size:11px;">TOTALS — ${wonDeals.length} deal${wonDeals.length!==1?'s':''} &nbsp;·&nbsp; ${stageCounts}</td>
     <td style="font-family:'DM Mono',monospace;color:#22c55e;">${zar(totRev)}</td>
     <td style="font-family:'DM Mono',monospace;">${zar(totCost)}</td>
     <td style="font-family:'DM Mono',monospace;color:#22c55e;">${zar(totProf)}</td>
