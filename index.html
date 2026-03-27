@@ -2001,6 +2001,8 @@ function renderBoard(){
   stages.forEach(stage=>{
     const stageDeals=deals.filter(d=>!d.archived&&d.name&&d.name.trim()!==''&&d.stage===stage.id&&d.pipeline===curPipeline)
       .sort((a,b)=>{
+        if(a.name==='AFR Internal — Team') return -1;
+        if(b.name==='AFR Internal — Team') return 1;
         if(!a.movedate&&!b.movedate) return 0;
         if(!a.movedate) return 1;
         if(!b.movedate) return -1;
@@ -4980,7 +4982,12 @@ function copyQuoteColumn(stageId, btn){
     !x.archived && x.name && x.name.trim()!=='' &&
     x.name !== 'AFR Internal — Team' &&
     x.stage===stageId && x.pipeline==='pre'
-  );
+  ).sort((a,b)=>{
+    if(!a.movedate&&!b.movedate) return 0;
+    if(!a.movedate) return 1;
+    if(!b.movedate) return -1;
+    return a.movedate.localeCompare(b.movedate);
+  });
   if(!stageDealsList.length){ alert('No deals in this column.'); return; }
   const text = buildQuoteEmail(stageDealsList);
   copyToClipboard(text, btn);
@@ -7163,8 +7170,8 @@ function setCalView(v){
   calViewMode = v;
   document.getElementById('calWeekBtn').style.cssText  = v==='week'  ? 'padding:4px 10px;font-size:12px;background:var(--accent);color:#fff;border-color:var(--accent);' : 'padding:4px 10px;font-size:12px;';
   document.getElementById('calMonthBtn').style.cssText = v==='month' ? 'padding:4px 10px;font-size:12px;background:var(--accent);color:#fff;border-color:var(--accent);' : 'padding:4px 10px;font-size:12px;';
-  if(v==='week')  calStartDate = getMonday(calStartDate||new Date());
-  if(v==='month') { const d=calStartDate||new Date(); calStartDate=new Date(d.getFullYear(),d.getMonth(),1); }
+  if(v==='week')  calStartDate = getMonday(new Date()); // always jump to current week
+  if(v==='month') { const d=new Date(); calStartDate=new Date(d.getFullYear(),d.getMonth(),1); }
   renderCalendar();
 }
 
