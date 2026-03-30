@@ -1706,53 +1706,7 @@ let leads = [
   {id:1774100000020,name:'Sharon Harikissoon',phone:'072 120 9467',from:'8 Alison crt, Morgenster, Brackenfell',to:'Hillary, Durban,4094',source:'Moving24',label:'CURRENT',nextActivity:'2026-04-01',createdDate:'2026-03-04',lost:false,_ts:1774100000020},
 ];
 
-let deals = [
-  // ── POST-BOOKING — March 2026 ──────────────────────────────────────────────
-  mk(11,'Musa Hlangwane',      'won','post',{quo:'8253',inv:'4651',transporter:'Key Moves',   fromCity:'Malmesbury',    toCity:'Pretoria',    movedate:'2026-03-26',bookedDate:'2026-03-01',value:15134.00, cost:11100.00,payment:'Fully Paid',  source:'Moving24',       tc:true, confirmed:true, notes:''}),
-  mk(12,'Leon Renney',         'won','post',{quo:'8362',inv:'4653',transporter:'Key Moves',   fromCity:'Boksburg',      toCity:'Uvongo',      movedate:'2026-03-10',bookedDate:'2026-03-01',value:43119.25, cost:24550.00,payment:'Fully Paid',  source:'Moving24',       tc:true, confirmed:true, notes:'Riaan Pack/ Pierre Shuttle/ Intertrans Shuttle'}),
-  mk(13,'Eleanor Whytock',     'won','post',{quo:'8360',inv:'4652',transporter:'Key Moves',   fromCity:'Delmas',        toCity:'Port Edward', movedate:'2026-03-09',bookedDate:'2026-03-01',value:25472.50, cost:18100.00,payment:'Fully Paid',  source:'Repeat Customer', tc:true, confirmed:true, notes:'Client will arrange own shuttle'}),
-  mk(14,'Ernie Olivier',       'won','post',{quo:'8324',inv:'4654',transporter:'Key Moves',   fromCity:'Ballito',       toCity:'Randburg',    movedate:'2026-03-26',bookedDate:'2026-03-01',value:16054.00, cost:11800.00,payment:'Fully Paid',  source:'Repeat Customer', tc:true, confirmed:true, notes:''}),
-  mk(15,'Selva Naidoo',        'won','post',{quo:'8294',inv:'4655',transporter:'Mountain',    fromCity:'Edenvale',      toCity:'Cape Town',   movedate:'2026-03-21',bookedDate:'2026-03-01',value:8625.00,  cost:6500.00, payment:'Fully Paid',  source:'Repeat Customer', tc:true, confirmed:true, notes:'Athena incl Shuttles'}),
-  mk(16,'Neil Barrand',        'won','post',{quo:'8292',inv:'4656',transporter:'TAC',         fromCity:'Johannesburg',  toCity:'Mossel Bay',  movedate:'2026-03-26',bookedDate:'2026-03-01',value:6325.00,  cost:4440.00, payment:'Unpaid',      source:'Repeat Customer', tc:false,confirmed:false,notes:''}),
-  mk(17,'Monita van Niekerk',  'won','post',{quo:'8369',inv:'4657',transporter:'Key Moves',   fromCity:'Melkbosstrand', toCity:'Margate',     movedate:'2026-03-11',bookedDate:'2026-03-01',value:16215.00, cost:11520.00,payment:'Fully Paid',  source:'Moving24',       tc:true, confirmed:true, notes:'Peters Shuttle'}),
-  mk(18,'Oonag Pretorius',     'won','post',{quo:'8322',inv:'4658',transporter:'Multi Trans', fromCity:'Johannesburg',  toCity:'Skukuza',     movedate:'2026-03-12',bookedDate:'2026-03-01',value:16445.00, cost:12075.00,payment:'Fully Paid',  source:'Repeat Customer', tc:false,confirmed:true, notes:''}),
-  mk(19,'Clint Pinchin',       'won','post',{quo:'8345',inv:'4659',transporter:'Key Moves',   fromCity:'Pennington',    toCity:'Pretoria',    movedate:'2026-03-12',bookedDate:'2026-03-01',value:6980.50,  cost:4200.00, payment:'Fully Paid',  source:'Net4ce',          tc:true, confirmed:true, notes:''}),
-  mk(20,'Timera Jankypershad', 'won','post',{quo:'8374',inv:'4660',transporter:'HM Removals', fromCity:'Durban',        toCity:'Saldanha',    movedate:'2026-03-12',bookedDate:'2026-03-01',value:25990.00, cost:19595.00,payment:'Deposit Paid',source:'Repeat Customer', tc:true, confirmed:false,notes:''}),
-  mk(21,'Neo Maseko',          'won','post',{quo:'8382',inv:'4661',transporter:'Key Moves',   fromCity:'Port Elizabeth',toCity:'De Aar',      movedate:'2026-03-13',bookedDate:'2026-03-01',value:20142.25, cost:13550.00,payment:'Fully Paid',  source:'Repeat Customer', tc:true, confirmed:true, notes:''}),
-
-  // ── PIPEDRIVE IMPORT — 20 March 2026 ────────────────────────────────────────
-  mk(1774000000001,'Tumelo Padi',        'on_hold',       'pre',{quo:'8193', transporter:'',           movedate:'2026-04-30', value:28152,     cost:0, source:'Repeat Customer', createdDate:'2026-03-20'}),
-  mk(1774000000002,'David Rennie',        'on_hold',       'pre',{quo:'8277', transporter:'Intertrans',  movedate:'2026-06-30', value:30164.5,   cost:0, source:'Whatsapp',        createdDate:'2026-03-20'}),
-  mk(1774000000003,'Grant Theron',        'waiting',       'pre',{quo:'8279', transporter:'H&M',         movedate:'2026-04-01', deliverydate:'2026-04-03', value:14835, cost:0, source:'Moving24', createdDate:'2026-03-20'}),
-  mk(1774000000004,'Enver Peck',          'on_hold',       'pre',{quo:'8289', transporter:'Key Moves',   movedate:'2026-03-31', value:13627.5,   cost:0, source:'Website',         createdDate:'2026-03-20'}),
-  mk(1774000000005,'Tim Meyer',           'on_hold',       'pre',{quo:'8312', transporter:'Intertrans',  movedate:'2026-04-30', value:27007.75,  cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000006,'Carol Nkumanda',      'on_hold',       'pre',{quo:'8329', transporter:'Mountain View', movedate:'2026-03-27', value:20217,  cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000007,'Themba Kondile',      'interested',    'pre',{quo:'',     transporter:'H&M',         movedate:'2026-03-30', value:18083.75,  cost:0, source:'Whatsapp',        createdDate:'2026-03-20'}),
-  mk(1774000000008,'Rowan Kirchner',      'interested',    'pre',{quo:'8364', transporter:'H&M',         movedate:'2026-03-25', value:21700.5,   cost:0, source:'Whatsapp',        createdDate:'2026-03-20'}),
-  mk(1774000000009,'Bianca Dreyer',       'waiting',       'pre',{quo:'8385', transporter:'Key Moves',   movedate:'2026-04-27', value:6095,      cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000010,'Devin Deren',         'interested',    'pre',{quo:'8383', transporter:'Afford A Move', movedate:'2026-05-05', value:8073,    cost:0, source:'Repeat Customer', createdDate:'2026-03-20'}),
-  mk(1774000000011,'Henri vd Westhuizen', 'on_hold',       'pre',{quo:'8388', transporter:'H&M',         movedate:'2026-04-20', value:8648,      cost:0, source:'WOM',             createdDate:'2026-03-20'}),
-  mk(1774000000012,'Mike Wood',           'on_hold',       'pre',{quo:'8390', transporter:'H&M',         movedate:'2026-04-15', value:12851.25,  cost:0, source:'Database',        createdDate:'2026-03-20'}),
-  mk(1774000000013,'Pamela Senna QMS',    'waiting',       'pre',{quo:'8398', transporter:'Key Moves',   movedate:'2026-03-30', value:20038.75,  cost:0, source:'Whatsapp',        createdDate:'2026-03-20'}),
-  mk(1774000000014,'Morne Cloete',        'waiting',       'pre',{quo:'8399', transporter:'H&M',         movedate:'2026-04-08', value:47828.5,   cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000015,'Mrs Colleen Maistry', 'waiting',       'pre',{quo:'8419', transporter:'H&M',         movedate:'2026-03-30', value:17250,     cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000016,'Zerildi Pieterse',    'waiting',       'pre',{quo:'8414', transporter:'Key Moves',   movedate:'2026-04-28', value:59041,     cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000017,'Minx Avrabos',        'waiting',       'pre',{quo:'8417', transporter:'H&M',         movedate:'2026-04-28', value:44539.5,   cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000018,'Sam Adeline',         'waiting',       'pre',{quo:'8418', transporter:'Mountain View', movedate:'2026-03-30', value:4807,    cost:0, source:'Repeat Customer', createdDate:'2026-03-20'}),
-  mk(1774000000019,'Ruan Oosthuizen',     'waiting',       'pre',{quo:'8422', transporter:'Key Moves',   movedate:'2026-04-02', value:11563.25,  cost:0, source:'Whatsapp',        createdDate:'2026-03-20'}),
-  mk(1774000000020,'Francois Faasen',     'waiting',       'pre',{quo:'8420', transporter:'Key Moves',   movedate:'2026-04-01', value:40721.5,   cost:0, source:'Whatsapp',        createdDate:'2026-03-20'}),
-  mk(1774000000021,'Dane Smit',           'on_hold',       'pre',{quo:'8423', transporter:'Key Moves',   movedate:'2026-04-23', value:9510.5,    cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000022,'Sathie Chetty',       'waiting',       'pre',{quo:'8426', transporter:'Key Moves',   movedate:'2026-04-17', value:65400.5,   cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000023,'Natasha Kwinda',      'ready_to_quote','pre',{quo:'8431', transporter:'Key Moves',   movedate:'2026-04-09', value:4830,      cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000024,'Siyabonga Hlengwa',   'quoted',        'pre',{quo:'8430', transporter:'Key Moves',   movedate:'2026-03-25', value:15352.5,   cost:0, source:'Whatsapp',        createdDate:'2026-03-20'}),
-  mk(1774000000025,'Ann Nina Maritz',     'quoted',        'pre',{quo:'8429', transporter:'H&M',         movedate:'2026-03-31', value:21643,     cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000026,'Taryn Daniels',       'await_transporter','pre',{quo:'', transporter:'',             movedate:'2026-03-25', value:0,         cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-  mk(1774000000027,'Mapaseka Mtshali',    'await_transporter','pre',{quo:'', transporter:'Tri-Global',   movedate:'2026-03-28', value:0,         cost:0, source:'Tri-Global',       createdDate:'2026-03-20'}),
-  mk(1774000000028,'Sello Ramohlokoane',  'await_transporter','pre',{quo:'', transporter:'Tri-Global',   movedate:'2026-03-31', value:0,         cost:0, source:'Tri-Global',       createdDate:'2026-03-20'}),
-  mk(1774000000029,'Anita Kolisi',        'await_transporter','pre',{quo:'', transporter:'Tri-Global',   movedate:'2026-03-31', value:0,         cost:0, source:'Tri-Global',       createdDate:'2026-03-20'}),
-  mk(1774000000030,'Zandile Gxwanti',     'quote_request', 'pre',{quo:'',    transporter:'',             movedate:'2026-03-30', value:0,         cost:0, source:'Net4ce',           createdDate:'2026-03-20'}),
-  mk(1774000000031,'Jan Adriaan Stander', 'quote_request', 'pre',{quo:'',    transporter:'',             movedate:'',           value:0,         cost:0, source:'Moving24',         createdDate:'2026-03-20'}),
-];
+let deals = [];
 
 
 console.log('[AFR CRM] Deals loaded:', deals.length);
