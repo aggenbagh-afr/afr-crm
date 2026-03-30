@@ -5199,6 +5199,8 @@ function printCoverPage(){
 
   var dateStr = new Date().toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
   var phones  = [d.phone,d.phone2].filter(Boolean).join(' / ')||'—';
+  var emails  = [d.email,d.email2].filter(Boolean).join(' / ');
+  var contactLine = phones + (emails ? '  &nbsp;|&nbsp;  ' + emails : '');
   var fromAddr= [d.fromCity,d.fromSuburb,d.from].filter(Boolean).join(', ')||'—';
   var toAddr  = [d.toCity,d.toSuburb,d.to].filter(Boolean).join(', ')||'—';
   var AL={good:'Good Access',maybe:'Query Access',steep:'Steep Access',dirt:'Dirt Road',stairs:'Stairs',lift:'Lift',hoisting:'Hoisting',shuttle:'Shuttle Required'};
@@ -5296,7 +5298,7 @@ function printCoverPage(){
     +'<div style="border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:16px;">'
     +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
     +'<div><div style="font-size:22px;font-weight:700;letter-spacing:.5px;">'+d.name.toUpperCase()+'</div>'
-    +'<div style="font-size:13px;color:#555;margin-top:2px;">'+phones+'</div></div>'
+    +'<div style="font-size:13px;color:#555;margin-top:2px;">'+contactLine+'</div></div>'
     +'<div style="text-align:right;font-size:12px;color:#555;">'
     +(d.bookedDate?'<div>Booked: '+bookedStr+'</div>':'')
     +'<div>'+( d.source||'')+'</div>'
@@ -5343,7 +5345,7 @@ function printCoverPage(){
     +'<div class="pg">'
     +'<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:16px;">'
     +'<div style="font-size:16px;font-weight:700;">'+d.name.toUpperCase()+' — Notes &amp; Transporter Quote</div>'
-    +'<div style="font-size:12px;color:#555;">'+phones+' &nbsp;·&nbsp; '+dateStr+'</div>'
+    +'<div style="font-size:12px;color:#555;">'+contactLine+' &nbsp;·&nbsp; '+dateStr+'</div>'
     +'</div>'
 
     // Our quote table
