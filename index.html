@@ -1426,15 +1426,26 @@ function setSyncStatus(state, msg){
 
 async function pushRecord(record, attempt){
   attempt = attempt || 1;
-  record._ts = record._ts || Date.now(); // timestamp for conflict resolution
-  try {
-    const res = await fetch(SHEET_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({action:'save', payload: record})
+  record._ts = record._ts || Date.now();
+  // Deep copy to avoid mutating original when trimming
+  var payload = JSON.parse(JSON.stringify(record));
+  var encoded = encodeURIComponent(JSON.stringify(payload));
+  // Auto-trim if payload too large for GET URL
+  if(encoded.length > 7000){
+    if(payload.partnerQuotes) payload.partnerQuotes = payload.partnerQuotes.map(function(q){
+      return Object.assign({}, q, {quote:(q.quote||'').slice(0,150), ourQuote:(q.ourQuote||'').slice(0,100)});
     });
+    encoded = encodeURIComponent(JSON.stringify(payload));
+  }
+  if(encoded.length > 7000){
+    if(payload.dealNotes) payload.dealNotes = (payload.dealNotes||[]).slice(-3).map(function(n){
+      return Object.assign({}, n, {text:(n.text||'').slice(0,300)});
+    });
+    encoded = encodeURIComponent(JSON.stringify(payload));
+  }
+  try {
+    const res = await fetch(SHEET_URL + '?action=save&payload=' + encoded);
     if(res.ok) return true;
-    // Non-OK HTTP response — retry once after 4 s (covers Apps Script cold start)
     if(attempt < 3){
       setSyncStatus('syncing','Saving… (retry '+(attempt)+')');
       await new Promise(function(r){setTimeout(r, attempt===1?4000:6000);});
@@ -1443,7 +1454,6 @@ async function pushRecord(record, attempt){
     setSyncStatus('error','🔴 Save failed — stored locally');
     return false;
   } catch(e){
-    // Network error — retry up to 2 times
     if(attempt < 3){
       setSyncStatus('syncing','Reconnecting… ('+attempt+'/2)');
       await new Promise(function(r){setTimeout(r, attempt===1?4000:7000);});
