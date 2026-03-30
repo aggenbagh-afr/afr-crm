@@ -4152,7 +4152,7 @@ function buildStageUI(d){
 
   // Dropdown
   const dd=document.getElementById('stageDropdown');
-  dd.innerHTML=[...PRE,...POST].map(s=>`<option value="${s.id}"${s.id===d.stage?' selected':''}>${s.id.startsWith(PRE[0].id)||PRE.find(x=>x.id===s.id)?'Pre: ':'Post: '}${s.label}</option>`).join('');
+  dd.innerHTML=[...QUOTING,...PRE,...POST].map(s=>`<option value="${s.id}"${s.id===d.stage?' selected':''}>${QUOTING.find(x=>x.id===s.id)?'Quoting: ':PRE.find(x=>x.id===s.id)?'Pre: ':'Post: '}${s.label}</option>`).join('');
 
   // Progress bar
   const bar=document.getElementById('stageProgress');
@@ -5633,7 +5633,7 @@ function switchOrToggle(p, btn){
     // Switching to a different pipeline — restore its last view mode
     switchPipeline(p, btn);
     const mode = pipelineViewMode[p] || 'board';
-    btn.textContent = (mode==='list' ? '≡ ' : '⊞ ') + (p==='pre'?'Pre-Booking':'Post-Booking');
+    btn.textContent = (mode==='list' ? '≡ ' : '⊞ ') + (p==='quoting'?'Quoting':p==='pre'?'Pre-Booking':'Post-Booking');
     if(mode==='list'){
       activeView='listview';
       document.getElementById('boardView').style.display='none';
