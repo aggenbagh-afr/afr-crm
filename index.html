@@ -391,7 +391,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 
 <!-- PIPELINE BAR -->
 <div class="pipeline-bar" id="pipelineBar">
-  <button class="pipeline-btn active" id="preBt" onclick="switchOrToggle('pre',this)">⊞ Pre-Booking</button>
+  <button class="pipeline-btn active" id="quotingBt" onclick="switchOrToggle('quoting',this)">⊞ Quoting</button>
+  <button class="pipeline-btn" id="preBt" onclick="switchOrToggle('pre',this)">⊞ Pre-Booking</button>
   <button class="pipeline-btn" id="postBt" onclick="switchOrToggle('post',this)">⊞ Post-Booking</button>
   <button class="pipeline-btn" id="wonBt" onclick="switchPipeline('won',this)" style="border-color:rgba(34,197,94,.4);color:#22c55e;">Won ✓</button>
   <button class="pipeline-btn" id="lostBt" onclick="switchPipeline('lost',this)" style="border-color:rgba(239,68,68,.3);color:#ef4444;">Lost ✗</button>
@@ -1383,13 +1384,18 @@ setTheme(localStorage.getItem('afr_theme') || 'dark');
 // DATA
 // ═══════════════════════════════════════════════════════════════
 
-const PRE = [
+const QUOTING = [
   {id:'quote_request',label:'Quote Request',stripe:'#4f7cff'},
-  {id:'await_transporter',label:'Await Transporter Quote',stripe:'#6366f1'},
+  {id:'await_transporter',label:'Await Partner Quote',stripe:'#6366f1'},
   {id:'deposit_needed',label:'Deposit Needed',stripe:'#8b5cf6'},
   {id:'ready_to_quote',label:'Ready to Quote',stripe:'#a855f7'},
   {id:'quoted',label:'Quoted',stripe:'#ec4899'},
-  {id:'interested',label:'Interested',stripe:'#f59e0b'},
+];
+
+const PRE = [
+  {id:'follow_up',label:'Followed Up',stripe:'#f59e0b'},
+  {id:'unreachable',label:'Unreachable',stripe:'#94a3b8'},
+  {id:'interested',label:'Interested',stripe:'#fb923c'},
   {id:'waiting',label:'Waiting',stripe:'#f97316'},
   {id:'on_hold',label:'On Hold',stripe:'#f43f5e'},
 ];
@@ -1398,15 +1404,15 @@ const POST = [
   {id:'ready_to_book',label:'Ready to Book',stripe:'#14b8a6'},
   {id:'booked',label:'Booked',stripe:'#06b6d4'},
   {id:'collect',label:'Collect',stripe:'#eab308'},
-  {id:'storage',label:'Storage',stripe:'#84cc16'},
   {id:'delivery',label:'Delivery',stripe:'#22c55e'},
   {id:'review',label:'Review',stripe:'#f59e0b'},
   {id:'issues',label:'Issues / Damages',stripe:'#ef4444'},
+  {id:'storage',label:'Storage',stripe:'#84cc16'},
   {id:'won',label:'Won ✓',stripe:'#16a34a'},
   {id:'lost',label:'Lost ✗',stripe:'#dc2626'},
 ];
 
-const ALL_STAGES = [...PRE, ...POST];
+const ALL_STAGES = [...QUOTING, ...PRE, ...POST];
 
 // ═══════════════════════════════════════════════════════════════
 // PERSISTENCE — Google Sheets (primary) + localStorage (cache)
@@ -1664,7 +1670,7 @@ let partners = [
   'Afford A Move','Afford','Jippie Vervoer','Pierre','Athena'
 ];
 
-let curPipeline = 'pre';
+let curPipeline = 'quoting';
 // Persist pipeline view mode (board/list) across refreshes
 let pipelineViewMode = (() => {
   try { return JSON.parse(localStorage.getItem('afr_pvm')||'null') || {pre:'board',post:'board'}; }
@@ -1964,7 +1970,7 @@ function renderBoard(){
   const scrollStates={};
   board.querySelectorAll('.col-cards').forEach(el=>{ if(el.id) scrollStates[el.id]=el.scrollTop; });
   board.innerHTML='';
-  const stages=(curPipeline==='pre'?PRE:POST).filter(s=>s.id!=='won'&&s.id!=='lost');
+  const stages=(curPipeline==='quoting'?QUOTING:curPipeline==='pre'?PRE:POST).filter(s=>s.id!=='won'&&s.id!=='lost');
 
   stages.forEach(stage=>{
     const stageDeals=deals.filter(d=>!d.archived&&d.name&&d.name.trim()!==''&&d.stage===stage.id&&d.pipeline===curPipeline)
@@ -1987,8 +1993,8 @@ function renderBoard(){
         <div class="col-title-row">
           <div class="col-title" style="color:${stage.stripe}">${stage.label}</div>
           <div style="display:flex;align-items:center;gap:4px;">
-            ${stage.id==='quote_request'&&curPipeline==='pre'&&stageDeals.filter(d=>d.name!=='AFR Internal — Team').length?`<button onclick="event.stopPropagation();copyQuoteColumn('${stage.id}',this)" style="background:none;border:1px solid var(--border2);border-radius:4px;padding:1px 5px;font-size:10px;color:var(--text3);cursor:pointer;" title="Copy all deals as quote request email">📤</button>`:''}
-            ${stage.id==='await_transporter'&&curPipeline==='pre'?`<button onclick="event.stopPropagation();newBatch()" style="background:none;border:1px solid rgba(99,102,241,.4);border-radius:4px;padding:1px 5px;font-size:10px;color:#818cf8;cursor:pointer;" title="New batch">+ Batch</button>`:''}
+            ${stage.id==='quote_request'&&curPipeline==='quoting'&&stageDeals.filter(d=>d.name!=='AFR Internal — Team').length?`<button onclick="event.stopPropagation();copyQuoteColumn('${stage.id}',this)" style="background:none;border:1px solid var(--border2);border-radius:4px;padding:1px 5px;font-size:10px;color:var(--text3);cursor:pointer;" title="Copy all deals as quote request email">📤</button>`:''}
+            ${stage.id==='await_transporter'&&curPipeline==='quoting'?`<button onclick="event.stopPropagation();newBatch()" style="background:none;border:1px solid rgba(99,102,241,.4);border-radius:4px;padding:1px 5px;font-size:10px;color:#818cf8;cursor:pointer;" title="New batch">+ Batch</button>`:''}
             <div class="col-count">${stageDeals.length}</div>
           </div>
         </div>
@@ -2009,7 +2015,7 @@ function renderBoard(){
   updatePipeTotal();
   const dzPos = document.getElementById('dropZonePositive');
   if(dzPos){
-    dzPos.textContent = curPipeline==='pre' ? '→ Ready to Book (Post-Booking)' : '✓ Drop here to mark Won';
+    dzPos.textContent = (curPipeline==='quoting'||curPipeline==='pre') ? '→ Ready to Book (Post-Booking)' : '✓ Drop here to mark Won';
     dzPos.style.color = 'rgba(34,197,94,.6)';
   }
   // Restore column scroll positions
@@ -2030,7 +2036,7 @@ function cardHTML(d){
     :'<span class="tag" style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);">Confirmed ✗</span>';
 
   // Breadcrumb for hover
-  const pipeStages=d.pipeline==='pre'?PRE:[...POST];
+  const pipeStages=d.pipeline==='quoting'?QUOTING:d.pipeline==='pre'?PRE:[...POST];
   const bcHtml=pipeStages.map(s=>`<span class="bc-step${s.id===d.stage?' current':''}">${s.label.split(' ')[0]}</span>${s.id!==pipeStages[pipeStages.length-1].id?'<span class="bc-sep">›</span>':''}`).join('');
 
   const _isInternal = d.name==='AFR Internal — Team';
@@ -2669,7 +2675,7 @@ function escHtml(s){
 function handlePositiveDrop(e){
   // Pre-booking: move to Ready to Book in Post-Booking
   // Post-booking: move to Won
-  if(curPipeline==='pre'){
+  if(curPipeline==='quoting'||curPipeline==='pre'){
     dropCard(e,'ready_to_book');
     // Switch to post-booking to show the deal
     const btn = document.getElementById('postBt');
@@ -2689,7 +2695,9 @@ function dropCard(e,stageId){
   // If dropping back into await_transporter col (not a batch), remove from any batch
   if(stageId==='await_transporter' && d.stage==='await_transporter'){ moveToBatch(id, null); return; } // locked
   d.stage=stageId;
-  if(POST.find(s=>s.id===stageId))d.pipeline='post'; else d.pipeline='pre';
+  if(POST.find(s=>s.id===stageId)) d.pipeline='post';
+  else if(PRE.find(s=>s.id===stageId)) d.pipeline='pre';
+  else d.pipeline='quoting';
   if((stageId==='booked'||stageId==='ready_to_book') && !d.bookedDate) d.bookedDate = new Date().toISOString().slice(0,10);
   if(stageId==='ready_to_book'){ d.pipeline='post'; }
   window._dragId=null;
@@ -2980,8 +2988,8 @@ function confirmDeleteLead(id){
 function qualifyLead(id){
   const l=leads.find(x=>x.id===id);
   if(!l)return;
-  if(!confirm(`Move "${l.name}" to the Pipeline?\n\nThis will create a new deal in Pre-Booking → Quote Request.`)) return;
-  const nd=mk(Date.now(),l.name,'quote_request','pre',{
+  if(!confirm(`Move "${l.name}" to the Pipeline?\n\nThis will create a new deal in Quoting → Quote Request.`)) return;
+  const nd=mk(Date.now(),l.name,'quote_request','quoting',{
     phone:l.phone, email:l.email||'', source:l.source,
     from:l.from||'', fromCity:l.fromCity||(l.from?l.from.split(',')[0].trim():''),
     fromSuburb:l.fromSuburb||'', fromProvince:l.fromProvince||'',
@@ -3129,7 +3137,7 @@ function sortByCol(col){
   const active = document.getElementById('sh-'+col);
   if(active) active.classList.add(listSortDir==='asc'?'sorted-asc':'sorted-desc');
   // Show date range bar only for movedate col on pre-booking
-  const showDateBar = col==='movedate' && curPipeline==='pre';
+  const showDateBar = col==='movedate' && (curPipeline==='pre'||curPipeline==='quoting');
   document.getElementById('listDateFilters').style.display = showDateBar ? 'flex' : 'none';
   if(!showDateBar){ listDateFilter='all'; document.querySelectorAll('#listDateFilters .lf-btn').forEach(b=>b.classList.remove('active')); document.querySelector('#listDateFilters .lf-btn').classList.add('active'); }
   renderList();
@@ -3260,7 +3268,7 @@ function getListLabel(d){
 function renderListHeaders(){
   const head = document.getElementById('listHead');
   if(!head) return;
-  const isPre = curPipeline === 'pre';
+  const isPre = curPipeline === 'pre' || curPipeline === 'quoting';
 
   if(isPre){
     const cols = [
@@ -3312,7 +3320,7 @@ function renderList(){
   let d = deals.filter(x => x.pipeline===curPipeline && x.stage!=='won' && x.stage!=='lost' && !x.archived);
 
   // Date filter — pre-booking only, when movedate column is active
-  if(curPipeline==='pre' && listSortCol==='movedate' && listDateFilter!=='all'){
+  if((curPipeline==='pre'||curPipeline==='quoting') && listSortCol==='movedate' && listDateFilter!=='all'){
     const now = new Date();
     const thisMonth = now.getMonth(), thisYear = now.getFullYear();
     const nextMonth = thisMonth===11 ? 0 : thisMonth+1;
@@ -3353,7 +3361,7 @@ function renderList(){
     });
   }
 
-  const isPre = curPipeline==='pre';
+  const isPre = curPipeline==='pre'||curPipeline==='quoting';
   tbody.innerHTML = d.map(x => {
     const profit = (+x.value||0)-(+x.cost||0);
     let pc = '';
@@ -3401,7 +3409,7 @@ function renderList(){
   }).join('');
 
   // Keep date filter bar in sync
-  const showDate = listSortCol==='movedate' && curPipeline==='pre';
+  const showDate = listSortCol==='movedate' && (curPipeline==='pre'||curPipeline==='quoting');
   const df = document.getElementById('listDateFilters');
   if(df) df.style.display = showDate ? 'flex' : 'none';
   // Restore saved column widths
@@ -3930,7 +3938,7 @@ function openDeal(id){
   refreshFlags();
 
   // Subtitle
-  document.getElementById('modalSubtitle').textContent=`${d.name||'New Deal'} · ${stageLabel(d.stage)} · ${d.pipeline==='pre'?'Pre-Booking':'Post-Booking'}`;
+  document.getElementById('modalSubtitle').textContent=`${d.name||'New Deal'} · ${stageLabel(d.stage)} · ${d.pipeline==='quoting'?'Quoting':d.pipeline==='pre'?'Pre-Booking':'Post-Booking'}`;
 
   // Xero btn
   const xb=document.getElementById('xeroBtn');
@@ -4003,7 +4011,7 @@ function openDealByName(name){
 }
 
 function openNewDeal(){
-  const stage = curPipeline==='pre' ? 'quote_request' : 'ready_to_book';
+  const stage = curPipeline==='quoting' ? 'quote_request' : curPipeline==='pre' ? 'follow_up' : 'ready_to_book';
   const nd = mk(Date.now(), '', stage, curPipeline);
   // Auto-seed Transport cost line
   nd.costLines = [{desc:'Transport cost', amt:0}];
@@ -4139,7 +4147,7 @@ function closeModal(){
 }
 
 function buildStageUI(d){
-  const stages=d.pipeline==='pre'?PRE:POST;
+  const stages=d.pipeline==='quoting'?QUOTING:d.pipeline==='pre'?PRE:POST;
   const idx=stages.findIndex(s=>s.id===d.stage);
 
   // Dropdown
@@ -4170,10 +4178,11 @@ function stageDropdownChange(val){
     }
   }
   d.stage=val;
-  if(POST.find(s=>s.id===val))d.pipeline='post';
-  else d.pipeline='pre';
+  if(POST.find(s=>s.id===val)) d.pipeline='post';
+  else if(PRE.find(s=>s.id===val)) d.pipeline='pre';
+  else d.pipeline='quoting';
   if(val==='booked' && !d.bookedDate) d.bookedDate = new Date().toISOString().slice(0,10);
-  document.getElementById('modalSubtitle').textContent=`${d.name||'New Deal'} · ${stageLabel(val)} · ${d.pipeline==='pre'?'Pre-Booking':'Post-Booking'}`;
+  document.getElementById('modalSubtitle').textContent=`${d.name||'New Deal'} · ${stageLabel(val)} · ${d.pipeline==='quoting'?'Quoting':d.pipeline==='pre'?'Pre-Booking':'Post-Booking'}`;
   buildStageUI(d);
   document.getElementById('requestReviewBtn').style.display=val==='review'?'flex':'none';
 }
@@ -4378,7 +4387,9 @@ function saveDeal(){
   const newStage = document.getElementById('stageDropdown').value;
   // stage always saved
   d.stage = newStage;
-  if(POST.find(s=>s.id===d.stage))d.pipeline='post';else d.pipeline='pre';
+  if(POST.find(s=>s.id===d.stage)) d.pipeline='post';
+  else if(PRE.find(s=>s.id===d.stage)) d.pipeline='pre';
+  else d.pipeline='quoting';
   if(d.stage==='booked' && !d.bookedDate) d.bookedDate = new Date().toISOString().slice(0,10);
   clearDraft(currentDealId);
   closeModal();
@@ -4993,7 +5004,7 @@ function copyQuoteColumn(stageId, btn){
   const stageDealsList = deals.filter(x=>
     !x.archived && x.name && x.name.trim()!=='' &&
     x.name !== 'AFR Internal — Team' &&
-    x.stage===stageId && x.pipeline==='pre'
+    x.stage===stageId && (x.pipeline==='pre'||x.pipeline==='quoting')
   ).sort((a,b)=>{
     if(!a.movedate&&!b.movedate) return 0;
     if(!a.movedate) return 1;
@@ -5603,7 +5614,7 @@ function switchOrToggle(p, btn){
     const current = pipelineViewMode[p] || 'board';
     pipelineViewMode[p] = current === 'board' ? 'list' : 'board';
     // Update button icon
-    btn.textContent = (pipelineViewMode[p]==='list' ? '≡ ' : '⊞ ') + (p==='pre'?'Pre-Booking':'Post-Booking');
+    btn.textContent = (pipelineViewMode[p]==='list' ? '≡ ' : '⊞ ') + (p==='quoting'?'Quoting':p==='pre'?'Pre-Booking':'Post-Booking');
     // Switch view
     if(pipelineViewMode[p]==='list'){
       activeView='listview';
@@ -6885,7 +6896,7 @@ STORE.load();
 // ── RESTORE LAST VIEW ────────────────────────────────────────────────────────
 (function restoreLastView(){
   const lastView     = localStorage.getItem('afr_last_view')     || 'pipeline';
-  const lastPipeline = localStorage.getItem('afr_last_pipeline') || 'pre';
+  const lastPipeline = localStorage.getItem('afr_last_pipeline') || 'quoting';
   curPipeline = (lastPipeline==='won'||lastPipeline==='lost') ? 'pre' : lastPipeline;
 
   // Activate correct nav tab
