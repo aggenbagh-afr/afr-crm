@@ -393,7 +393,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 <div class="pipeline-bar" id="pipelineBar">
   <button class="pipeline-btn active" id="quotingBt" onclick="switchOrToggle('quoting',this)">⊞ Quoting</button>
   <button class="pipeline-btn" id="preBt" onclick="switchOrToggle('pre',this)">⊞ Pre-Booking</button>
-  <button class="pipeline-btn" id="postBt" onclick="switchOrToggle('post',this)">⊞ Post-Booking</button>
+  <button class="pipeline-btn" id="postBt" onclick="switchOrToggle('post',this)">⊞ BOOKED</button>
   <button class="pipeline-btn" id="wonBt" onclick="switchPipeline('won',this)" style="border-color:rgba(34,197,94,.4);color:#22c55e;">Won ✓</button>
   <button class="pipeline-btn" id="lostBt" onclick="switchPipeline('lost',this)" style="border-color:rgba(239,68,68,.3);color:#ef4444;">Lost ✗</button>
   <button class="pipeline-btn" id="cancelBt" onclick="switchPipeline('cancelled',this)" style="border-color:rgba(249,115,22,.3);color:#f97316;">Cancelled ✗</button>
@@ -2015,7 +2015,7 @@ function renderBoard(){
   updatePipeTotal();
   const dzPos = document.getElementById('dropZonePositive');
   if(dzPos){
-    dzPos.textContent = (curPipeline==='quoting'||curPipeline==='pre') ? '→ Ready to Book (Post-Booking)' : '✓ Drop here to mark Won';
+    dzPos.textContent = curPipeline==='quoting' ? '→ Followed Up (Pre-Booking)' : curPipeline==='pre' ? '→ Ready to Book (Booked)' : '✓ Drop here to mark Won';
     dzPos.style.color = 'rgba(34,197,94,.6)';
   }
   // Restore column scroll positions
@@ -2673,11 +2673,14 @@ function escHtml(s){
 // ═══════════════════════════════════════════════════════════════
 
 function handlePositiveDrop(e){
-  // Pre-booking: move to Ready to Book in Post-Booking
+  // Pre-booking: move to Ready to Book in BOOKED
   // Post-booking: move to Won
-  if(curPipeline==='quoting'||curPipeline==='pre'){
+  if(curPipeline==='quoting'){
+    dropCard(e,'follow_up');
+    const btn = document.getElementById('preBt');
+    if(btn){ curPipeline='pre'; document.querySelectorAll('.pipeline-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+  } else if(curPipeline==='pre'){
     dropCard(e,'ready_to_book');
-    // Switch to post-booking to show the deal
     const btn = document.getElementById('postBt');
     if(btn){ curPipeline='post'; document.querySelectorAll('.pipeline-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
   } else {
@@ -3938,7 +3941,7 @@ function openDeal(id){
   refreshFlags();
 
   // Subtitle
-  document.getElementById('modalSubtitle').textContent=`${d.name||'New Deal'} · ${stageLabel(d.stage)} · ${d.pipeline==='quoting'?'Quoting':d.pipeline==='pre'?'Pre-Booking':'Post-Booking'}`;
+  document.getElementById('modalSubtitle').textContent=`${d.name||'New Deal'} · ${stageLabel(d.stage)} · ${d.pipeline==='quoting'?'Quoting':d.pipeline==='pre'?'Pre-Booking':'BOOKED'}`;
 
   // Xero btn
   const xb=document.getElementById('xeroBtn');
@@ -4182,7 +4185,7 @@ function stageDropdownChange(val){
   else if(PRE.find(s=>s.id===val)) d.pipeline='pre';
   else d.pipeline='quoting';
   if(val==='booked' && !d.bookedDate) d.bookedDate = new Date().toISOString().slice(0,10);
-  document.getElementById('modalSubtitle').textContent=`${d.name||'New Deal'} · ${stageLabel(val)} · ${d.pipeline==='quoting'?'Quoting':d.pipeline==='pre'?'Pre-Booking':'Post-Booking'}`;
+  document.getElementById('modalSubtitle').textContent=`${d.name||'New Deal'} · ${stageLabel(val)} · ${d.pipeline==='quoting'?'Quoting':d.pipeline==='pre'?'Pre-Booking':'BOOKED'}`;
   buildStageUI(d);
   document.getElementById('requestReviewBtn').style.display=val==='review'?'flex':'none';
 }
@@ -5614,7 +5617,7 @@ function switchOrToggle(p, btn){
     const current = pipelineViewMode[p] || 'board';
     pipelineViewMode[p] = current === 'board' ? 'list' : 'board';
     // Update button icon
-    btn.textContent = (pipelineViewMode[p]==='list' ? '≡ ' : '⊞ ') + (p==='quoting'?'Quoting':p==='pre'?'Pre-Booking':'Post-Booking');
+    btn.textContent = (pipelineViewMode[p]==='list' ? '≡ ' : '⊞ ') + (p==='quoting'?'Quoting':p==='pre'?'Pre-Booking':'BOOKED');
     // Switch view
     if(pipelineViewMode[p]==='list'){
       activeView='listview';
@@ -5633,7 +5636,7 @@ function switchOrToggle(p, btn){
     // Switching to a different pipeline — restore its last view mode
     switchPipeline(p, btn);
     const mode = pipelineViewMode[p] || 'board';
-    btn.textContent = (mode==='list' ? '≡ ' : '⊞ ') + (p==='quoting'?'Quoting':p==='pre'?'Pre-Booking':'Post-Booking');
+    btn.textContent = (mode==='list' ? '≡ ' : '⊞ ') + (p==='quoting'?'Quoting':p==='pre'?'Pre-Booking':'BOOKED');
     if(mode==='list'){
       activeView='listview';
       document.getElementById('boardView').style.display='none';
@@ -5703,7 +5706,7 @@ function switchPipeline(p,btn){
     const preBt = document.getElementById('preBt');
     const postBt = document.getElementById('postBt');
     if(preBt) preBt.textContent = icon + ' Pre-Booking';
-    if(postBt) postBt.textContent = icon + ' Post-Booking';
+    if(postBt) postBt.textContent = icon + ' BOOKED';
   }
 }
 
@@ -6916,7 +6919,7 @@ STORE.load();
   const preBt = document.getElementById('preBt');
   const postBt = document.getElementById('postBt');
   if(preBt)  preBt.textContent  = (pipelineViewMode.pre ==='list'?'≡ ':'⊞ ')+'Pre-Booking';
-  if(postBt) postBt.textContent = (pipelineViewMode.post==='list'?'≡ ':'⊞ ')+'Post-Booking';
+  if(postBt) postBt.textContent = (pipelineViewMode.post==='list'?'≡ ':'⊞ ')+'BOOKED';
 
   // Show correct view
   const pipelineBar = document.getElementById('pipelineBar');
