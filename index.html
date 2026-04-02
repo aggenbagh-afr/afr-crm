@@ -1216,6 +1216,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
         📝 Notes &amp; Instructions <span class="sec-chevron">▼</span>
       </div>
       <div class="modal-section-body" style="display:flex;flex-direction:column;gap:12px;">
+        <!-- Special Instructions — shown first -->
+        <div>
+          <div class="field-label" style="margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;">Special Instructions</div>
+          <div class="field">
+            <textarea id="f_notes" placeholder="Access notes, parking info, special requirements..." oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+          </div>
+        </div>
         <!-- Timestamped Notes -->
         <div>
           <div class="field-label" style="margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;">Notes</div>
@@ -1224,13 +1231,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
             <button onclick="addDealNote()" style="background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;cursor:pointer;">+ Add</button>
           </div>
           <div id="dealNotesList" style="display:flex;flex-direction:column;gap:6px;"></div>
-        </div>
-        <!-- Special Instructions -->
-        <div>
-          <div class="field-label" style="margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;">Special Instructions</div>
-          <div class="field">
-            <textarea id="f_notes" placeholder="Access notes, parking info, special requirements..." oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
-          </div>
         </div>
       </div>
     </div>
@@ -5370,7 +5370,8 @@ function printCoverPage(){
   // Notes block
   parts.push('<div style="flex:1;display:flex;flex-direction:column;margin-bottom:14px;">');
   parts.push('<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:5px;">Special Instructions / Notes</div>');
-  parts.push('<div style="'+lined+'min-height:160px;font-size:13px;color:#444;">'+(d.notes||d.pricing||'')+'</div>');
+  var notesContent=(d.notes||d.pricing||'').replace(/\n/g,'<br>');
+  parts.push('<div style="'+lined+'min-height:160px;font-size:13px;color:#444;">'+notesContent+'</div>');
   parts.push('</div>');
   parts.push('<div style="border-top:0.5px solid #ddd;padding-top:8px;font-size:11px;color:#888;text-align:center;">'+footer+'</div>');
   parts.push('</div>');
@@ -7085,7 +7086,7 @@ function calNav(dir){
 }
 
 function calGoToday(){
-  calStartDate = calViewMode==='week' ? getMonday(new Date()) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const _tn=new Date(); calStartDate = calViewMode==='week' ? getMonday(new Date()) : (_tn.getDate()>=15 ? new Date(_tn.getFullYear(),_tn.getMonth(),15) : new Date(_tn.getFullYear(),_tn.getMonth()-1,15));
   renderCalendar();
 }
 
@@ -7168,15 +7169,15 @@ function renderCalendar(){
       e.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});
   } else {
     const y=calStartDate.getFullYear(), m=calStartDate.getMonth();
-    // Start on 15th, end on 14th of next month (30 days)
-    for(let i=0;i<30;i++){
-      const d=new Date(y,m,15+i);
-      days.push(d);
+    // Start on 15th, end on 14th of next month
+    const endDate = new Date(y,m+1,14); // 14th of next month
+    const startDate = new Date(y,m,15);
+    for(let cur=new Date(startDate); cur<=endDate; cur.setDate(cur.getDate()+1)){
+      days.push(new Date(cur));
     }
-    const endDate = days[days.length-1];
     const mNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
     document.getElementById('calRangeLabel').textContent =
-      '15 '+mNames[m]+' — 14 '+mNames[endDate.getMonth()]+' '+endDate.getFullYear();
+      '15 '+mNames[m]+' — 14 '+mNames[(m+1)%12]+' '+(m===11?y+1:y);
   }
 
   // Active post-booking stages
