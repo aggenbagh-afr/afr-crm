@@ -99,6 +99,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 /* CARD */
 .card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px;cursor:pointer;transition:all .15s;position:relative;}
 .card:hover{border-color:var(--accent);background:var(--surface3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
+.card.has-task{border-color:rgba(239,68,68,.6);box-shadow:0 0 0 2px rgba(239,68,68,.2);}
+.card.has-task:hover{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.3);}
 .card-company{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:2px;}
 .card-name{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:5px;padding-right:12px;line-height:1.3;}
 .card-meta{display:flex;flex-direction:column;gap:3px;}
@@ -332,7 +334,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
     <button class="nav-tab" onclick="showView('leads',this)">Leads</button>
     <button class="nav-tab active" onclick="showView('pipeline',this)" id="pipelineNavBtn">Pipeline</button>
     <button class="nav-tab" onclick="showView('calendar',this)">📅 Calendar</button>
-    <button class="nav-tab" onclick="showView('tasks',this)">📌 Tasks</button>
+    <button class="nav-tab" id="tasksNavBtn" onclick="showView('tasks',this)">📌 Tasks <span id="tasksNavBadge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:3px;"></span></button>
     <button class="nav-tab" onclick="showView('reports',this)">📊 Reports</button>
     <div class="templates-nav-wrap" style="position:relative;">
       <button class="nav-tab" onclick="toggleTemplates(event)" id="templatesNavBtn">📋 Templates ▾</button>
@@ -1386,6 +1388,7 @@ setTheme(localStorage.getItem('afr_theme') || 'dark');
 
 const QUOTING = [
   {id:'quote_request',label:'Quote Request',stripe:'#4f7cff'},
+  {id:'re_quote',label:'Re-Quote',stripe:'#f43f5e'},
   {id:'await_transporter',label:'Await Partner Quote',stripe:'#6366f1'},
   {id:'deposit_needed',label:'Deposit Needed',stripe:'#8b5cf6'},
   {id:'ready_to_quote',label:'Ready to Quote',stripe:'#a855f7'},
@@ -1598,6 +1601,7 @@ async function pullAll(){
     if(window._pendingReportsInit){ window._pendingReportsInit=false; initReports(); }
     else if(document.getElementById('reportsView')?.style.display!=='none'){ renderReports(); } // re-render to catch overhead arriving from Sheet
     updateMentionBadge();
+    updateTaskNavBadge();
     setSyncStatus('ok','🟢 Live · '+new Date().toLocaleTimeString('en-ZA'));
   } catch(e){
     setSyncStatus('error','🔴 Offline — using local cache');
@@ -2040,7 +2044,8 @@ function cardHTML(d){
   const bcHtml=pipeStages.map(s=>`<span class="bc-step${s.id===d.stage?' current':''}">${s.label.split(' ')[0]}</span>${s.id!==pipeStages[pipeStages.length-1].id?'<span class="bc-sep">›</span>':''}`).join('');
 
   const _isInternal = d.name==='AFR Internal — Team';
-  return `<div class="card${_isInternal?' internal-pinned':''}" draggable="${!_isInternal}" data-id="${d.id}"
+  const _hasOutstandingTask = (d.tasks||[]).some(t=>!t.done);
+  return `<div class="card${_isInternal?' internal-pinned':''}${_hasOutstandingTask?' has-task':''}" draggable="${!_isInternal}" data-id="${d.id}"
     ondragstart="${_isInternal?'event.preventDefault()':'event.dataTransfer.setData(\'text/plain\',String('+d.id+'));window._dragId='+d.id+';this.style.opacity=\'.4\''}"
     ondragend="this.style.opacity='1';document.querySelectorAll('.col').forEach(c=>c.classList.remove('drag-over'))"
     onclick="openDeal(${d.id})">
@@ -5229,24 +5234,23 @@ function printCoverPage(){
   var phones  = [d.phone,d.phone2].filter(Boolean).join(' / ')||'—';
   var emails  = [d.email,d.email2].filter(Boolean).join(' / ');
   var contactLine = phones + (emails ? '  &nbsp;|&nbsp;  ' + emails : '');
-  var fromAddr= [d.fromCity,d.fromSuburb,d.from].filter(Boolean).join(', ')||'—';
-  var toAddr  = [d.toCity,d.toSuburb,d.to].filter(Boolean).join(', ')||'—';
+  var bookedStr = d.bookedDate ? new Date(d.bookedDate).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}) : '—';
   var AL={good:'Good Access',maybe:'Query Access',steep:'Steep Access',dirt:'Dirt Road',stairs:'Stairs',lift:'Lift',hoisting:'Hoisting',shuttle:'Shuttle Required'};
   var fromAccess=(d.fromAccess||[]).map(function(k){return AL[k]||k;}).join(', ')||'Good Access';
   var toAccess=(d.toAccess||[]).map(function(k){return AL[k]||k;}).join(', ')||'Good Access';
-  var fromAccessColor=(!d.fromAccess||!d.fromAccess.length||d.fromAccess[0]==='good')?'#e8f5e9':'#fff3e0';
-  var fromAccessTextColor=(!d.fromAccess||!d.fromAccess.length||d.fromAccess[0]==='good')?'#2e7d32':'#e65100';
-  var toAccessColor=(!d.toAccess||!d.toAccess.length||d.toAccess[0]==='good')?'#e8f5e9':'#fff3e0';
-  var toAccessTextColor=(!d.toAccess||!d.toAccess.length||d.toAccess[0]==='good')?'#2e7d32':'#e65100';
+  var fromAC=(!d.fromAccess||!d.fromAccess.length||d.fromAccess[0]==='good')?'#e8f5e9':'#fff3e0';
+  var fromAT=(!d.fromAccess||!d.fromAccess.length||d.fromAccess[0]==='good')?'#2e7d32':'#e65100';
+  var toAC=(!d.toAccess||!d.toAccess.length||d.toAccess[0]==='good')?'#e8f5e9':'#fff3e0';
+  var toAT=(!d.toAccess||!d.toAccess.length||d.toAccess[0]==='good')?'#2e7d32':'#e65100';
+  var fmtD=function(s){if(!s)return '—';var p=s.split('-');if(p.length<3)return s;var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return parseInt(p[2])+' '+(mn[parseInt(p[1])-1]||p[1]);};
+  var dedicatedStr = d.dedicated ? '<span style="background:#fff3e0;color:#e65100;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;">Dedicated</span>' : 'Standard truck';
+  var fromStreet=d.from||'', fromSuburb=d.fromSuburb||'', fromCity=d.fromCity||'';
+  var toStreet=d.to||'', toSuburb=d.toSuburb||'', toCity=d.toCity||'';
 
-  var fmtDate=function(s){if(!s)return '—';var p=s.split('-');if(p.length<3)return s;var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return parseInt(p[2])+' '+(months[parseInt(p[1])-1]||p[1]);};
-  var bookedStr=d.bookedDate?new Date(d.bookedDate).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}):'—';
-
-  // Services rows
+  // Services
   var serviceRows='';
-  var addSvc=function(label,val,highlight){
-    var color=highlight?'color:'+highlight+';font-weight:600;':'';
-    serviceRows+='<tr><td style="color:#888;padding:2px 0;font-size:13px;">'+label+'</td><td style="text-align:right;padding:2px 0;font-size:13px;'+color+'">'+val+'</td></tr>';
+  var addSvc=function(label,val,color){
+    serviceRows+='<tr><td style="color:#888;padding:2px 0;font-size:12px;">'+label+'</td><td style="text-align:right;padding:2px 0;font-size:12px;'+(color?'color:'+color+';font-weight:600;':'')+'">'+val+'</td></tr>';
   };
   var payColor=d.payment==='Fully Paid'?'#16a34a':d.payment==='Deposit Paid'?'#d97706':'#dc2626';
   addSvc('Payment',d.payment||'—',payColor);
@@ -5260,151 +5264,136 @@ function printCoverPage(){
     if(d.shuttle_to_who)   addSvc('Delivery Shuttle',d.shuttle_to_who+(d.shuttle_to_note?' ('+d.shuttle_to_note+')':''),'');
   }
 
+  // Quote revisions
+  var quotes=d.quotes&&d.quotes.length?d.quotes:[{amt:d.value||'',quo:d.quo||'',date:''}];
+  var activeIdx=d.selectedQuote||0;
+  var quoteRows='';
+  quotes.forEach(function(q,i){
+    var label=i===0?'Quote 1':'Revision '+i;
+    var isActive=i===activeIdx;
+    var amt=q.amt?'R'+Number(q.amt).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+    var bg=isActive?'background:#f0fdf4;font-weight:700;':'';
+    var c1='<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:12px;">'+label+(isActive?' ✓':'')+'</td>';
+    var c2='<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:13px;font-weight:700;color:'+(isActive?'#16a34a':'#111')+';">'+amt+'</td>';
+    var c3=q.quo?'<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:11px;color:#888;">QUO-'+q.quo+'</td>':'<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:11px;color:#ccc;">—</td>';
+    var c4=q.date?'<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:11px;color:#888;">'+fmtD(q.date)+'</td>':'<td style="padding:4px 8px;border:0.5px solid #ddd;"></td>';
+    quoteRows+='<tr style="'+bg+'">'+c1+c2+c3+c4+'</tr>';
+  });
+  var activeAmt=quotes[activeIdx]&&quotes[activeIdx].amt?'R'+Number(quotes[activeIdx].amt).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2}):(d.value?'R'+Number(d.value).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2}):'—');
+
   // Cost breakdown
-  var costRows='';var costTotal=0;
+  var costRows=''; var costTotal=0;
   if(d.costLines&&d.costLines.length){
     d.costLines.forEach(function(l){
       costTotal+=+l.amt||0;
-      costRows+='<tr><td style="padding:4px 0;border-bottom:0.5px solid #eee;font-size:13px;">'+l.desc+'</td>'
-               +'<td style="text-align:right;font-weight:600;padding:4px 0;border-bottom:0.5px solid #eee;font-size:13px;">R'+Number(l.amt).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
+      var cr1='<td style="padding:5px 8px;border:0.5px solid #ddd;font-size:13px;">'+l.desc+'</td>';
+      var cr2='<td style="padding:5px 8px;border:0.5px solid #ddd;text-align:right;font-size:13px;">R'+Number(l.amt).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>';
+      costRows+='<tr>'+cr1+cr2+'</tr>';
     });
-    costRows+='<tr style="font-weight:700;"><td style="padding:4px 0;font-size:13px;">Total</td><td style="text-align:right;padding:4px 0;font-size:13px;">R'+costTotal.toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
+    var tot1='<td style="padding:5px 8px;border:0.5px solid #ddd;font-size:13px;">Total Cost</td>';
+    var tot2='<td style="padding:5px 8px;border:0.5px solid #ddd;text-align:right;font-size:13px;">R'+costTotal.toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>';
+    costRows+='<tr style="background:#f5f5f5;font-weight:700;">'+tot1+tot2+'</tr>';
+    var clientVal=+d.value||+(quotes[activeIdx]&&quotes[activeIdx].amt)||0;
+    if(clientVal>0){
+      var q1='<td style="padding:6px 8px;border:0.5px solid #ddd;font-size:13px;font-weight:700;">Our Quote to Client</td>';
+      var q2='<td style="padding:6px 8px;border:0.5px solid #ddd;text-align:right;font-size:15px;font-weight:700;color:#16a34a;">R'+clientVal.toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>';
+      costRows+='<tr style="background:#f0fdf4;">'+q1+q2+'</tr>';
+      var profit=clientVal-costTotal;
+      var p1='<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:12px;color:#555;">Profit</td>';
+      var p2='<td style="padding:4px 8px;border:0.5px solid #ddd;text-align:right;font-size:13px;font-weight:600;color:'+(profit>=0?'#16a34a':'#dc2626')+';">(R'+Math.abs(profit).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+')</td>';
+      costRows+='<tr>'+p1+p2+'</tr>';
+    }
   } else {
-    costRows='<tr><td colspan="2" style="color:#999;font-size:13px;padding:4px 0;">No cost breakdown entered</td></tr>';
+    costRows='<tr><td colspan="2" style="padding:8px;color:#999;font-size:13px;">No cost breakdown entered</td></tr>';
   }
 
-  // Notes (dealNotes newest first)
+  // Deal notes newest first
   var notesHtml='';
   var dnotes=(d.dealNotes||[]).slice().reverse();
   if(dnotes.length){
     dnotes.forEach(function(n){
       var ts=n.at?new Date(n.at).toLocaleString('en-ZA',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
-      notesHtml+='<div style="padding:8px 0;border-bottom:0.5px solid #eee;">'
-        +'<div style="font-size:13px;color:#111;">'+n.text.replace(/\n/g,'<br>')+'</div>'
-        +(ts?'<div style="font-size:10px;color:#aaa;margin-top:3px;">'+ts+(n.by?' · '+n.by:'')+'</div>':'')
-        +'</div>';
+      var nb='<div style="font-size:13px;color:#111;">'+n.text.replace(/\n/g,'<br>')+'</div>';
+      var tb=ts?'<div style="font-size:10px;color:#aaa;margin-top:2px;">'+ts+(n.by?' · '+n.by:'')+'</div>':'';
+      notesHtml+='<div style="padding:7px 0;border-bottom:0.5px solid #eee;">'+nb+tb+'</div>';
     });
   } else {
     notesHtml='<div style="font-size:13px;color:#999;padding:8px 0;">No notes recorded.</div>';
   }
 
-  // Our quote to client (page 2)
-  var quoteRows='';
-  var clientVal=+d.value||0;
-  if(d.costLines&&d.costLines.length){
-    d.costLines.forEach(function(l){
-      quoteRows+='<tr><td style="padding:5px 8px;border:0.5px solid #ddd;font-size:13px;">'+l.desc+'</td>'
-                +'<td style="padding:5px 8px;border:0.5px solid #ddd;text-align:right;font-size:13px;">R'+Number(l.amt).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
-    });
-    quoteRows+='<tr style="background:#f5f5f5;font-weight:700;"><td style="padding:5px 8px;border:0.5px solid #ddd;font-size:13px;">Total Cost</td>'
-              +'<td style="padding:5px 8px;border:0.5px solid #ddd;text-align:right;font-size:13px;">R'+costTotal.toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
-  }
-  if(clientVal>0){
-    quoteRows+='<tr style="background:#f0fdf4;"><td style="padding:6px 8px;border:0.5px solid #ddd;font-size:13px;font-weight:700;">Our Quote to Client</td>'
-              +'<td style="padding:6px 8px;border:0.5px solid #ddd;text-align:right;font-size:15px;font-weight:700;color:#16a34a;">R'+clientVal.toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
-    if(costTotal>0){
-      var profit=clientVal-costTotal;
-      quoteRows+='<tr><td style="padding:5px 8px;border:0.5px solid #ddd;font-size:12px;color:#555;">Profit</td>'
-                +'<td style="padding:5px 8px;border:0.5px solid #ddd;text-align:right;font-size:13px;font-weight:600;color:'+(profit>=0?'#16a34a':'#dc2626')+';">(R'+Math.abs(profit).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+')</td></tr>';
-    }
-  }
+  var footer='Hein 079 620 4696 &nbsp;&nbsp; Janine 064 582 1275 &nbsp;&nbsp; Zane 064 479 9385 &nbsp;&nbsp; Email: info@a-f-r.co.za';
+  var lined='flex:1;border:0.5px solid #ccc;border-radius:4px;padding:8px 10px;background-image:repeating-linear-gradient(transparent,transparent 27px,#ddd 27px,#ddd 28px);background-position:0 32px;';
 
-  var footer = 'Hein 079 620 4696 &nbsp;&nbsp; Janine 064 582 1275 &nbsp;&nbsp; Zane 064 479 9385 &nbsp;&nbsp; Email: info@a-f-r.co.za';
-  var dedicatedStr = d.dedicated ? '<span style="background:#fff3e0;color:#e65100;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:6px;">Dedicated</span>' : 'Standard truck';
+  var parts=[];
+  parts.push('<style>body{font-family:Arial,sans-serif;color:#111;margin:0;padding:0;}.pg{padding:22px 26px;min-height:260mm;box-sizing:border-box;display:flex;flex-direction:column;page-break-after:always;}.pg:last-child{page-break-after:auto;}</style>');
 
-  var pg = '<style>'
-    +'body{font-family:Arial,sans-serif;color:#111;margin:0;padding:0;}'
-    +'.pg{padding:28px 32px;min-height:267mm;box-sizing:border-box;display:flex;flex-direction:column;page-break-after:always;}'
-    +'.pg:last-child{page-break-after:auto;}'
-    +'@media print{.pg{padding:20px 24px;}}'
-    +'</style>'
+  // PAGE 1
+  parts.push('<div class="pg">');
+  // Header
+  parts.push('<div style="border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:14px;">');
+  parts.push('<div style="display:flex;justify-content:space-between;align-items:flex-start;">');
+  parts.push('<div><div style="font-size:22px;font-weight:700;">'+d.name.toUpperCase()+'</div>');
+  parts.push('<div style="font-size:13px;color:#555;margin-top:2px;">'+contactLine+'</div></div>');
+  parts.push('<div style="text-align:right;font-size:12px;color:#555;">');
+  if(d.bookedDate) parts.push('<div>Booked: '+bookedStr+'</div>');
+  if(d.source) parts.push('<div>'+d.source+'</div>');
+  parts.push('<div style="margin-top:3px;font-size:11px;">'+(d.quo?'QUO-'+d.quo:'')+((d.quo&&d.inv)?' &nbsp;·&nbsp; ':'')+( d.inv?'INV-'+d.inv:'')+'</div>');
+  parts.push('</div></div>');
+  // Tiles
+  parts.push('<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1.3fr;gap:8px;margin-top:12px;">');
+  parts.push('<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#166534;text-transform:uppercase;letter-spacing:.5px;">Quote Total</div><div style="font-size:16px;font-weight:700;color:#16a34a;margin-top:2px;">'+activeAmt+'</div></div>');
+  parts.push('<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Load Date</div><div style="font-size:15px;font-weight:700;margin-top:2px;">'+fmtD(d.movedate)+'</div></div>');
+  parts.push('<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Delivery</div><div style="font-size:15px;font-weight:700;margin-top:2px;">'+fmtD(d.deliverydate)+'</div></div>');
+  parts.push('<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Volume</div><div style="font-size:15px;font-weight:700;margin-top:2px;">'+(d.volume||'—')+'</div></div>');
+  parts.push('<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Transporter</div><div style="font-size:13px;font-weight:700;margin-top:2px;">'+(d.transporter||'—')+'</div><div style="font-size:10px;color:#888;">'+dedicatedStr+'</div></div>');
+  parts.push('</div></div>');
+  // Addresses
+  parts.push('<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">');
+  parts.push('<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:5px;">Collection</div>');
+  if(fromStreet) parts.push('<div style="font-size:13px;color:#444;">'+fromStreet+'</div>');
+  if(fromSuburb) parts.push('<div style="font-size:13px;color:#444;">'+fromSuburb+'</div>');
+  if(fromCity)   parts.push('<div style="font-size:14px;font-weight:600;">'+fromCity+'</div>');
+  parts.push('<div style="margin-top:5px;display:inline-block;background:'+fromAC+';color:'+fromAT+';font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;">'+fromAccess+'</div></div>');
+  parts.push('<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:5px;">Delivery</div>');
+  if(toStreet) parts.push('<div style="font-size:13px;color:#444;">'+toStreet+'</div>');
+  if(toSuburb) parts.push('<div style="font-size:13px;color:#444;">'+toSuburb+'</div>');
+  if(toCity)   parts.push('<div style="font-size:14px;font-weight:600;">'+toCity+'</div>');
+  parts.push('<div style="margin-top:5px;display:inline-block;background:'+toAC+';color:'+toAT+';font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;">'+toAccess+'</div></div>');
+  parts.push('</div>');
+  // Quote revisions + Services
+  parts.push('<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">');
+  parts.push('<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:5px;">Quote Revisions</div>');
+  parts.push('<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#f5f5f5;"><th style="padding:4px 8px;border:0.5px solid #ddd;text-align:left;font-size:11px;">Quote</th><th style="padding:4px 8px;border:0.5px solid #ddd;text-align:right;font-size:11px;">Amount</th><th style="padding:4px 8px;border:0.5px solid #ddd;font-size:11px;">Ref</th><th style="padding:4px 8px;border:0.5px solid #ddd;font-size:11px;">Date</th></tr></thead><tbody>'+quoteRows+'</tbody></table></div>');
+  parts.push('<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:5px;">Services &amp; Status</div>');
+  parts.push('<table style="width:100%;border-collapse:collapse;">'+serviceRows+'</table></div>');
+  parts.push('</div>');
+  // Notes block
+  parts.push('<div style="flex:1;display:flex;flex-direction:column;margin-bottom:14px;">');
+  parts.push('<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:5px;">Special Instructions / Notes</div>');
+  parts.push('<div style="'+lined+'min-height:160px;font-size:13px;color:#444;">'+(d.notes||d.pricing||'')+'</div>');
+  parts.push('</div>');
+  parts.push('<div style="border-top:0.5px solid #ddd;padding-top:8px;font-size:11px;color:#888;text-align:center;">'+footer+'</div>');
+  parts.push('</div>');
 
-    // ── PAGE 1 ──
-    +'<div class="pg">'
+  // PAGE 2
+  parts.push('<div class="pg">');
+  parts.push('<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:14px;"><div style="font-size:16px;font-weight:700;">'+d.name.toUpperCase()+' — Cost &amp; Notes</div><div style="font-size:12px;color:#555;">'+contactLine+' &nbsp;·&nbsp; '+dateStr+'</div></div>');
+  // Cost breakdown
+  parts.push('<div style="margin-bottom:14px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:6px;">Cost Breakdown</div>');
+  parts.push('<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#f5f5f5;"><th style="padding:6px 8px;border:0.5px solid #ddd;text-align:left;font-size:12px;">Item</th><th style="padding:6px 8px;border:0.5px solid #ddd;text-align:right;font-size:12px;">Amount</th></tr></thead><tbody>'+costRows+'</tbody></table></div>');
+  // Notes
+  parts.push('<div style="margin-bottom:14px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:6px;">Notes</div>'+notesHtml+'</div>');
+  // Additional notes
+  parts.push('<div style="flex:1;display:flex;flex-direction:column;margin-bottom:14px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:5px;">Additional Notes</div><div style="'+lined+'min-height:80px;"></div></div>');
+  parts.push('<div style="border-top:0.5px solid #ddd;padding-top:8px;font-size:11px;color:#888;text-align:center;">'+footer+' &nbsp;·&nbsp; Page 2</div>');
+  parts.push('</div>');
 
-    // Header
-    +'<div style="border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:16px;">'
-    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-    +'<div><div style="font-size:22px;font-weight:700;letter-spacing:.5px;">'+d.name.toUpperCase()+'</div>'
-    +'<div style="font-size:13px;color:#555;margin-top:2px;">'+contactLine+'</div></div>'
-    +'<div style="text-align:right;font-size:12px;color:#555;">'
-    +(d.bookedDate?'<div>Booked: '+bookedStr+'</div>':'')
-    +'<div>'+( d.source||'')+'</div>'
-    +'<div style="margin-top:4px;font-size:11px;">'+(d.quo?'QUO-'+d.quo:'')+( d.quo&&d.inv?' &nbsp;·&nbsp; ':'')+( d.inv?'INV-'+d.inv:'')+'</div>'
-    +'</div></div>'
-
-    // Key tiles
-    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:14px;">'
-    +'<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Load Date</div><div style="font-size:15px;font-weight:700;margin-top:2px;">'+fmtDate(d.movedate)+'</div></div>'
-    +'<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Delivery</div><div style="font-size:15px;font-weight:700;margin-top:2px;">'+fmtDate(d.deliverydate)+'</div></div>'
-    +'<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Volume</div><div style="font-size:15px;font-weight:700;margin-top:2px;">'+(d.volume||'—')+'</div></div>'
-    +'<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Transporter</div><div style="font-size:13px;font-weight:700;margin-top:2px;">'+(d.transporter||'—')+'</div><div style="font-size:10px;color:#888;">'+dedicatedStr+'</div></div>'
-    +'</div></div>'
-
-    // Addresses
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">'
-    +'<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:6px;">Collection</div>'
-    +'<div style="font-size:14px;font-weight:600;">'+fromAddr+'</div>'
-    +'<div style="margin-top:6px;display:inline-block;background:'+fromAccessColor+';color:'+fromAccessTextColor+';font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;">'+fromAccess+'</div></div>'
-    +'<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:6px;">Delivery</div>'
-    +'<div style="font-size:14px;font-weight:600;">'+toAddr+'</div>'
-    +'<div style="margin-top:6px;display:inline-block;background:'+toAccessColor+';color:'+toAccessTextColor+';font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;">'+toAccess+'</div></div>'
-    +'</div>'
-
-    // Cost + Services
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">'
-    +'<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:6px;">Cost Breakdown</div>'
-    +'<table style="width:100%;border-collapse:collapse;">'+costRows+'</table></div>'
-    +'<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:6px;">Services &amp; Status</div>'
-    +'<table style="width:100%;border-collapse:collapse;">'+serviceRows+'</table></div>'
-    +'</div>'
-
-    // Notes — fills remainder
-    +'<div style="flex:1;display:flex;flex-direction:column;margin-bottom:16px;">'
-    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:6px;">Special Instructions / Notes</div>'
-    +'<div style="flex:1;border:0.5px solid #ddd;border-radius:4px;padding:8px 10px;font-size:13px;color:#444;min-height:180px;">'+(d.notes||d.pricing||'')+'</div>'
-    +'</div>'
-
-    // Footer
-    +'<div style="border-top:0.5px solid #ddd;padding-top:8px;font-size:11px;color:#888;text-align:center;">'+footer+'</div>'
-    +'</div>'
-
-    // ── PAGE 2 ──
-    +'<div class="pg">'
-    +'<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:16px;">'
-    +'<div style="font-size:16px;font-weight:700;">'+d.name.toUpperCase()+' — Notes &amp; Transporter Quote</div>'
-    +'<div style="font-size:12px;color:#555;">'+contactLine+' &nbsp;·&nbsp; '+dateStr+'</div>'
-    +'</div>'
-
-    // Our quote table
-    +'<div style="margin-bottom:16px;">'
-    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:8px;">Our Quote to Client</div>'
-    +'<table style="width:100%;border-collapse:collapse;">'
-    +'<thead><tr style="background:#f5f5f5;">'
-    +'<th style="padding:6px 8px;border:0.5px solid #ddd;text-align:left;font-weight:700;font-size:12px;">Item</th>'
-    +'<th style="padding:6px 8px;border:0.5px solid #ddd;text-align:right;font-weight:700;font-size:12px;">Amount</th>'
-    +'</tr></thead><tbody>'+quoteRows+'</tbody></table>'
-    +'</div>'
-
-    // Deal notes newest first
-    +'<div style="margin-bottom:16px;">'
-    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:8px;">Notes</div>'
-    +notesHtml
-    +'</div>'
-
-    // Open notes block
-    +'<div style="flex:1;display:flex;flex-direction:column;margin-bottom:16px;">'
-    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:6px;">Additional Notes</div>'
-    +'<div style="flex:1;border:0.5px solid #ddd;border-radius:4px;padding:8px 10px;min-height:80px;"></div>'
-    +'</div>'
-
-    +'<div style="border-top:0.5px solid #ddd;padding-top:8px;font-size:11px;color:#888;text-align:center;">'+footer+' &nbsp;·&nbsp; Page 2</div>'
-    +'</div>';
-
+  var pg=parts.join('');
   var area=document.getElementById('printArea');
   area.innerHTML=pg;
   window.print();
 }
+
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -5922,11 +5911,12 @@ function renderPartnerList(){
 // TASKS VIEW (NAV)
 // ═══════════════════════════════════════════════════════════════
 
-let tasksViewPerson = 'Janine';
+let tasksViewPerson = localStorage.getItem('afr_task_person') || 'Janine';
 let tasksViewTab    = 'tasks';
 
 function setTasksViewPerson(p){
   tasksViewPerson = p;
+  try{ localStorage.setItem('afr_task_person', p); }catch(e){}
   ['Janine','Zané','Hein','All'].forEach(n => {
     const el = document.getElementById('tv'+n.replace('é','e'));
     if(el) el.classList.toggle('active', n===p);
@@ -6063,10 +6053,22 @@ function tickPinnedTask(taskId){
   renderTasksView();
 }
 
+function updateTaskNavBadge(){
+  const badge = document.getElementById('tasksNavBadge');
+  if(!badge) return;
+  const person = tasksViewPerson;
+  let count = 0;
+  deals.forEach(d=>(d.tasks||[]).forEach(t=>{ if(!t.done&&(person==='All'||t.assignee===person)) count++; }));
+  leads.forEach(l=>(l.tasks||[]).forEach(t=>{ if(!t.done&&(person==='All'||t.assignee===person)) count++; }));
+  if(count>0){ badge.textContent=count; badge.style.display='inline'; }
+  else { badge.style.display='none'; }
+}
+
 function renderTasksView(){
   const content = document.getElementById('tasksViewContent');
   if(!content) return;
   updateMentionBadge();
+  updateTaskNavBadge();
   renderPinnedBoard();
 
   if(tasksViewTab === 'tasks'){
@@ -6603,7 +6605,7 @@ function renderReports(){
       return `<tr onclick="openDeal(${d.id})" style="cursor:pointer;">
         <td>${d.quo||'—'}</td><td>${d.inv||'—'}</td>
         <td style="text-align:center;font-size:14px;">${d.payment==='Fully Paid'?'🟢':d.payment==='Deposit Paid'?'🟡':'🔴'}</td>
-        <td style="font-weight:600;color:var(--text);">${d.name}</td>
+        <td style="font-weight:600;color:${(d.tasks||[]).some(t=>!t.done)?'var(--red)':'var(--text)'};">${d.name}${(d.tasks||[]).some(t=>!t.done)?'<span style="font-size:9px;margin-left:4px;vertical-align:middle;">●</span>':''}</td>
         <td>${d.transporter||'—'}</td>
         <td>${d.fromCity||d.from||'—'}</td><td>${d.toCity||d.to||'—'}</td>
         <td style="color:var(--text3);">${fmtDate(d.bookedDate)||fmtDate(d.movedate)||'—'}</td>
@@ -7065,7 +7067,7 @@ function getMonday(d){
 
 function calInit(){
   if(!calStartDate){
-    calStartDate = calViewMode==='week' ? getMonday(new Date()) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    calStartDate = calViewMode==='week' ? getMonday(new Date()) : (()=>{ const n=new Date(); return n.getDate()>=15 ? new Date(n.getFullYear(),n.getMonth(),15) : new Date(n.getFullYear(),n.getMonth()-1,15); })();
   }
   renderCalendar();
 }
@@ -7077,7 +7079,7 @@ function calNav(dir){
   } else {
     calStartDate = new Date(calStartDate);
     calStartDate.setMonth(calStartDate.getMonth() + dir);
-    calStartDate.setDate(1);
+    calStartDate.setDate(15);
   }
   renderCalendar();
 }
@@ -7092,7 +7094,7 @@ function setCalView(v){
   document.getElementById('calWeekBtn').style.cssText  = v==='week'  ? 'padding:4px 10px;font-size:12px;background:var(--accent);color:#fff;border-color:var(--accent);' : 'padding:4px 10px;font-size:12px;';
   document.getElementById('calMonthBtn').style.cssText = v==='month' ? 'padding:4px 10px;font-size:12px;background:var(--accent);color:#fff;border-color:var(--accent);' : 'padding:4px 10px;font-size:12px;';
   if(v==='week')  calStartDate = getMonday(new Date()); // always jump to current week
-  if(v==='month') { const d=new Date(); calStartDate=new Date(d.getFullYear(),d.getMonth(),1); }
+  if(v==='month') { const d=new Date(); calStartDate = d.getDate()>=15 ? new Date(d.getFullYear(),d.getMonth(),15) : new Date(d.getFullYear(),d.getMonth()-1,15); }
   renderCalendar();
 }
 
@@ -7166,10 +7168,15 @@ function renderCalendar(){
       e.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});
   } else {
     const y=calStartDate.getFullYear(), m=calStartDate.getMonth();
-    const daysInMonth=new Date(y,m+1,0).getDate();
-    for(let i=1;i<=daysInMonth;i++) days.push(new Date(y,m,i));
+    // Start on 15th, end on 14th of next month (30 days)
+    for(let i=0;i<30;i++){
+      const d=new Date(y,m,15+i);
+      days.push(d);
+    }
+    const endDate = days[days.length-1];
+    const mNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
     document.getElementById('calRangeLabel').textContent =
-      calStartDate.toLocaleDateString('en-ZA',{month:'long',year:'numeric'});
+      '15 '+mNames[m]+' — 14 '+mNames[endDate.getMonth()]+' '+endDate.getFullYear();
   }
 
   // Active post-booking stages
