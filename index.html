@@ -1436,10 +1436,12 @@ function setSyncStatus(state, msg){
 async function pushRecord(record, attempt){
   attempt = attempt || 1;
   record._ts = record._ts || Date.now();
+
   // Deep copy to avoid mutating original when trimming
   var payload = JSON.parse(JSON.stringify(record));
   var encoded = encodeURIComponent(JSON.stringify(payload));
-  // Auto-trim if payload too large for GET URL
+
+  // Auto-trim if payload too large
   if(encoded.length > 7000){
     if(payload.partnerQuotes) payload.partnerQuotes = payload.partnerQuotes.map(function(q){
       return Object.assign({}, q, {quote:(q.quote||'').slice(0,150), ourQuote:(q.ourQuote||'').slice(0,100)});
@@ -1452,9 +1454,19 @@ async function pushRecord(record, attempt){
     });
     encoded = encodeURIComponent(JSON.stringify(payload));
   }
+
   try {
-    const res = await fetch(SHEET_URL + '?action=save&payload=' + encoded);
-    if(res.ok) return true;
+    const res = await fetch(SHEET_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    });
+    if(res.ok){
+      var text = await res.text();
+      try { var json = JSON.parse(text); if(json.success) return true; } catch(e){}
+      return true;
+    }
     if(attempt < 3){
       setSyncStatus('syncing','Saving… (retry '+(attempt)+')');
       await new Promise(function(r){setTimeout(r, attempt===1?4000:6000);});
@@ -1463,6 +1475,7 @@ async function pushRecord(record, attempt){
     setSyncStatus('error','🔴 Save failed — stored locally');
     return false;
   } catch(e){
+    console.warn('pushRecord attempt '+attempt+' failed:', e);
     if(attempt < 3){
       setSyncStatus('syncing','Reconnecting… ('+attempt+'/2)');
       await new Promise(function(r){setTimeout(r, attempt===1?4000:7000);});
