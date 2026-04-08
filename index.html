@@ -309,6 +309,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .cal-table th.cal-today-hdr{background:rgba(79,124,255,.18);color:#93c5fd;}
 .cal-table td{border:1px solid var(--border);vertical-align:top;padding:0;position:relative;}
 .cal-table td.cal-today-col{background:rgba(79,124,255,.05);}
+.cal-table th.cal-weekend-hdr{background:rgba(148,163,184,.15);color:var(--text2);}
+.cal-table td.cal-weekend-col{background:rgba(148,163,184,.06);}
 .cal-client-col{width:180px;min-width:180px;background:var(--surface2);padding:7px 10px;vertical-align:top;cursor:pointer;border-right:2px solid var(--border2) !important;}
 .cal-client-col:hover{background:var(--surface3);}
 .cal-card-tip{position:fixed;z-index:9999;width:230px;pointer-events:none;opacity:0;transition:opacity .15s;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));}
@@ -376,6 +378,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
   </div>
 </div>
 
+<!-- TOMORROW DELIVERIES PREVIEW -->
+<div class="alert-banner" id="alertBanner8amTomorrow" style="display:none;background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);">
+  <strong style="color:#e8eaf2;white-space:nowrap;">Tomorrow's deliveries:</strong>
+  <div id="callList8amTomorrow" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  <button onclick="document.getElementById('alertBanner8amTomorrow').style.display='none'" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;">×</button>
+</div>
 <!-- 8AM DELIVERY BANNER -->
 <div class="alert-banner" id="alertBanner8am" style="display:none;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);">
   <span class="alert-icon">🚛</span>
@@ -853,6 +861,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
   <div class="modal-footer">
     <button class="btn btn-danger" id="leadDeleteBtn" onclick="deleteLead()" style="display:none;">Delete</button>
     <button class="btn btn-secondary" onclick="closeLeadModal()">Cancel</button>
+    <button id="leadLostBtn" class="btn" onclick="markLeadLostFromModal()" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#ef4444;display:none;">Lost ✗</button>
+    <button id="leadQualifyFooterBtn" class="btn" onclick="qualifyLeadFromModal()" style="background:rgba(79,124,255,.15);border:1px solid rgba(79,124,255,.3);color:#7ba4ff;display:none;">→ Pipeline</button>
     <button class="btn btn-primary" onclick="saveLead()">Save Lead</button>
   </div>
 </div>
@@ -1387,6 +1397,7 @@ setTheme(localStorage.getItem('afr_theme') || 'dark');
 // ═══════════════════════════════════════════════════════════════
 
 const QUOTING = [
+  {id:'preparing',label:'Preparing',stripe:'#64748b'},
   {id:'quote_request',label:'Quote Request',stripe:'#4f7cff'},
   {id:'re_quote',label:'Re-Quote',stripe:'#f43f5e'},
   {id:'await_transporter',label:'Await Partner Quote',stripe:'#6366f1'},
@@ -1819,6 +1830,23 @@ function renderCallList(){
       banner3.style.display='flex';
     } else {
       banner3.style.display='none';
+    }
+  }
+
+  // Tomorrow's deliveries preview
+  const delTomorrow = deals.filter(d=>activeStages.includes(d.stage) && d.deliverydate===tomorrow);
+  const banner8t = document.getElementById('alertBanner8amTomorrow');
+  const list8t   = document.getElementById('callList8amTomorrow');
+  if(banner8t && list8t){
+    if(delTomorrow.length){
+      list8t.innerHTML = delTomorrow.map(d=>`
+        <div class="alert-call" onclick="openDeal(${d.id})">
+          📅 ${d.name}
+          <span style="opacity:.7;font-size:10px;">${d.transporter?'('+d.transporter+')':''}</span>
+        </div>`).join('');
+      banner8t.style.display='flex';
+    } else {
+      banner8t.style.display='none';
     }
   }
 
@@ -2826,7 +2854,7 @@ function renderLeads(){
     else if(l.nextActivity==='Tomorrow')ac='next-tomorrow';
     else ac='next-overdue';
     const checked = _selectedLeadIds.has(l.id) ? 'checked' : '';
-    return `<tr>
+    return `<tr data-lead-id="${l.id}">
       <td style="text-align:center;"><input type="checkbox" class="lead-check" data-id="${l.id}" ${checked} onchange="onLeadCheckChange(this)" style="cursor:pointer;accent-color:var(--accent);"></td>
       <td style="color:var(--text);font-weight:500;cursor:pointer;" onclick="openEditLead(${l.id})">${l.name}</td>
       <td style="white-space:nowrap;font-size:11px;color:var(--text2);">${l.movedate?fmtDate(l.movedate):'—'}</td>
@@ -2876,6 +2904,8 @@ function openNewLead(){
   currentLeadId = null;
   document.getElementById('leadModalTitle').textContent = 'New Lead';
   document.getElementById('leadDeleteBtn').style.display = 'none';
+  const _qfb2 = document.getElementById('leadQualifyFooterBtn'); if(_qfb2) _qfb2.style.display='none';
+  const _lb2 = document.getElementById('leadLostBtn'); if(_lb2) _lb2.style.display='none';
   document.getElementById('lf_name').value = '';
   document.getElementById('lf_phone').value = '';
   populateSources('');
@@ -2903,6 +2933,10 @@ function openEditLead(id){
   currentLeadId = id;
   document.getElementById('leadModalTitle').textContent = 'Edit Lead';
   document.getElementById('leadDeleteBtn').style.display = 'flex';
+  const _qfb = document.getElementById('leadQualifyFooterBtn');
+  if(_qfb) _qfb.style.display = l.qualified ? 'none' : 'flex';
+  const _lostBtn = document.getElementById('leadLostBtn');
+  if(_lostBtn) _lostBtn.style.display = (l.lost||l.qualified) ? 'none' : 'flex';
   document.getElementById('lf_name').value = l.name;
   document.getElementById('lf_phone').value = l.phone;
   populateSources(l.source||'');
@@ -3006,11 +3040,41 @@ function confirmDeleteLead(id){
   renderLeads();
 }
 
+function highlightLeadRow(id){
+  // Scroll to and highlight the lead row in the leads table
+  const row = document.querySelector(`tr[data-lead-id="${id}"]`);
+  if(row){
+    row.scrollIntoView({behavior:'smooth', block:'center'});
+    row.style.transition='background .3s';
+    row.style.background='rgba(79,124,255,.25)';
+    setTimeout(()=>{ row.style.background=''; }, 2000);
+  } else {
+    // Row not found — open modal directly
+    openEditLead(id);
+  }
+}
+
+function markLeadLostFromModal(){
+  if(!currentLeadId) return;
+  const l = leads.find(x=>x.id===currentLeadId);
+  if(!l) return;
+  if(!confirm('Mark "'+l.name+'" as Lost?')) return;
+  l.lost = true;
+  l._ts = Date.now();
+  STORE.saveLead(l);
+  closeLeadModal();
+  renderLeads();
+}
+
+function qualifyLeadFromModal(){
+  if(currentLeadId){ closeLeadModal(); qualifyLead(currentLeadId); }
+}
+
 function qualifyLead(id){
   const l=leads.find(x=>x.id===id);
   if(!l)return;
   if(!confirm(`Move "${l.name}" to the Pipeline?\n\nThis will create a new deal in Quoting → Quote Request.`)) return;
-  const nd=mk(Date.now(),l.name,'quote_request','quoting',{
+  const nd=mk(Date.now(),l.name,'preparing','quoting',{
     phone:l.phone, email:l.email||'', source:l.source,
     from:l.from||'', fromCity:l.fromCity||(l.from?l.from.split(',')[0].trim():''),
     fromSuburb:l.fromSuburb||'', fromProvince:l.fromProvince||'',
@@ -3835,7 +3899,7 @@ function doSearch(q){
     </div>`;
 
   let html='';
-  if(leadRes.length){ html+=`<div class="search-group-label">Leads</div>`; html+=leadRes.map(l=>`<div class="search-item" onclick="closeSearch();showView('leads',document.querySelector('.nav-tab[onclick*=leads]'));setTimeout(()=>openEditLead(${l.id}),150)"><div class="search-item-name">${l.name}</div><div class="search-item-meta">${l.phone||''}${l.source?' · '+l.source:''}</div></div>`).join('');}
+  if(leadRes.length){ html+=`<div class="search-group-label">Leads</div>`; html+=leadRes.map(l=>`<div class="search-item" onclick="closeSearch();showView('leads',document.querySelector('.nav-tab[onclick*=leads]'));setTimeout(()=>highlightLeadRow(${l.id}),200)"><div class="search-item-name">${l.name}</div><div class="search-item-meta">${l.phone||''}${l.source?' · '+l.source:''}</div></div>`).join('');}
   if(active.length){ html+=`<div class="search-group-label">Active Deals</div>`; html+=active.map(d=>dealRow(d)).join('');}
   if(won.length){    html+=`<div class="search-group-label">Won</div>`;           html+=won.map(d=>dealRow(d,'<span style="color:var(--green);font-size:10px;">✓ WON</span>')).join('');}
   if(lost.length){   html+=`<div class="search-group-label">Lost</div>`;          html+=lost.map(d=>dealRow(d,'<span style="color:var(--red);font-size:10px;">✗ LOST</span>')).join('');}
@@ -4032,7 +4096,7 @@ function openDealByName(name){
 }
 
 function openNewDeal(){
-  const stage = curPipeline==='quoting' ? 'quote_request' : curPipeline==='pre' ? 'follow_up' : 'ready_to_book';
+  const stage = curPipeline==='quoting' ? 'preparing' : curPipeline==='pre' ? 'follow_up' : 'ready_to_book';
   const nd = mk(Date.now(), '', stage, curPipeline);
   // Auto-seed Transport cost line
   nd.costLines = [{desc:'Transport cost', amt:0}];
@@ -5251,10 +5315,8 @@ function printCoverPage(){
   var AL={good:'Good Access',maybe:'Query Access',steep:'Steep Access',dirt:'Dirt Road',stairs:'Stairs',lift:'Lift',hoisting:'Hoisting',shuttle:'Shuttle Required'};
   var fromAccess=(d.fromAccess||[]).map(function(k){return AL[k]||k;}).join(', ')||'Good Access';
   var toAccess=(d.toAccess||[]).map(function(k){return AL[k]||k;}).join(', ')||'Good Access';
-  var fromAC=(!d.fromAccess||!d.fromAccess.length||d.fromAccess[0]==='good')?'#e8f5e9':'#fff3e0';
-  var fromAT=(!d.fromAccess||!d.fromAccess.length||d.fromAccess[0]==='good')?'#2e7d32':'#e65100';
-  var toAC=(!d.toAccess||!d.toAccess.length||d.toAccess[0]==='good')?'#e8f5e9':'#fff3e0';
-  var toAT=(!d.toAccess||!d.toAccess.length||d.toAccess[0]==='good')?'#2e7d32':'#e65100';
+  var fromAC='#f5f5f5'; var fromAT='#111';
+  var toAC='#f5f5f5'; var toAT='#111';
   var fmtD=function(s){if(!s)return '—';var p=s.split('-');if(p.length<3)return s;var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return parseInt(p[2])+' '+(mn[parseInt(p[1])-1]||p[1]);};
   var dedicatedStr = d.dedicated ? '<span style="background:#fff3e0;color:#e65100;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;">Dedicated</span>' : 'Standard truck';
   var fromStreet=d.from||'', fromSuburb=d.fromSuburb||'', fromCity=d.fromCity||'';
@@ -5265,10 +5327,10 @@ function printCoverPage(){
   var addSvc=function(label,val,color){
     serviceRows+='<tr><td style="color:#888;padding:2px 0;font-size:12px;">'+label+'</td><td style="text-align:right;padding:2px 0;font-size:12px;'+(color?'color:'+color+';font-weight:600;':'')+'">'+val+'</td></tr>';
   };
-  var payColor=d.payment==='Fully Paid'?'#16a34a':d.payment==='Deposit Paid'?'#d97706':'#dc2626';
+  var payColor='#111';
   addSvc('Payment',d.payment||'—',payColor);
-  addSvc('T&Cs',d.tc?'Received':'Not received',d.tc?'#16a34a':'#dc2626');
-  addSvc('Confirmed',d.confirmed?'Yes':'No',d.confirmed?'#16a34a':'#dc2626');
+  addSvc('T&Cs',d.tc?'Received':'Not received','');
+  addSvc('Confirmed',d.confirmed?'Yes':'No','');
   if(d.packing&&d.packing!=='No') addSvc('Packing',d.packing,'');
   if(d.storage==='Yes') addSvc('Storage',d.storage_duration||'Yes','');
   if(d.insurance==='Yes') addSvc('Insurance','Yes (GIT)','');
@@ -5285,9 +5347,9 @@ function printCoverPage(){
     var label=i===0?'Quote 1':'Revision '+i;
     var isActive=i===activeIdx;
     var amt=q.amt?'R'+Number(q.amt).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
-    var bg=isActive?'background:#f0fdf4;font-weight:700;':'';
+    var bg=isActive?'background:#f0f0f0;font-weight:700;':'';
     var c1='<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:12px;">'+label+(isActive?' ✓':'')+'</td>';
-    var c2='<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:13px;font-weight:700;color:'+(isActive?'#16a34a':'#111')+';">'+amt+'</td>';
+    var c2='<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:13px;font-weight:700;color:#111;">'+amt+'</td>';
     var c3=q.quo?'<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:11px;color:#888;">QUO-'+q.quo+'</td>':'<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:11px;color:#ccc;">—</td>';
     var c4=q.date?'<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:11px;color:#888;">'+fmtD(q.date)+'</td>':'<td style="padding:4px 8px;border:0.5px solid #ddd;"></td>';
     quoteRows+='<tr style="'+bg+'">'+c1+c2+c3+c4+'</tr>';
@@ -5309,11 +5371,11 @@ function printCoverPage(){
     var clientVal=+d.value||+(quotes[activeIdx]&&quotes[activeIdx].amt)||0;
     if(clientVal>0){
       var q1='<td style="padding:6px 8px;border:0.5px solid #ddd;font-size:13px;font-weight:700;">Our Quote to Client</td>';
-      var q2='<td style="padding:6px 8px;border:0.5px solid #ddd;text-align:right;font-size:15px;font-weight:700;color:#16a34a;">R'+clientVal.toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>';
-      costRows+='<tr style="background:#f0fdf4;">'+q1+q2+'</tr>';
+      var q2='<td style="padding:6px 8px;border:0.5px solid #ddd;text-align:right;font-size:15px;font-weight:700;color:#111;">R'+clientVal.toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>';
+      costRows+='<tr style="background:#f0f0f0;">'+q1+q2+'</tr>';
       var profit=clientVal-costTotal;
       var p1='<td style="padding:4px 8px;border:0.5px solid #ddd;font-size:12px;color:#555;">Profit</td>';
-      var p2='<td style="padding:4px 8px;border:0.5px solid #ddd;text-align:right;font-size:13px;font-weight:600;color:'+(profit>=0?'#16a34a':'#dc2626')+';">(R'+Math.abs(profit).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+')</td>';
+      var p2='<td style="padding:4px 8px;border:0.5px solid #ddd;text-align:right;font-size:13px;font-weight:600;color:#111;">(R'+Math.abs(profit).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})+')</td>';
       costRows+='<tr>'+p1+p2+'</tr>';
     }
   } else {
@@ -5354,7 +5416,7 @@ function printCoverPage(){
   parts.push('</div></div>');
   // Tiles
   parts.push('<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1.3fr;gap:8px;margin-top:12px;">');
-  parts.push('<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#166534;text-transform:uppercase;letter-spacing:.5px;">Quote Total</div><div style="font-size:16px;font-weight:700;color:#16a34a;margin-top:2px;">'+activeAmt+'</div></div>');
+  parts.push('<div style="background:#f5f5f5;border:1px solid #ddd;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;">Quote Total</div><div style="font-size:16px;font-weight:700;color:#111;margin-top:2px;">'+activeAmt+'</div></div>');
   parts.push('<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Load Date</div><div style="font-size:15px;font-weight:700;margin-top:2px;">'+fmtD(d.movedate)+'</div></div>');
   parts.push('<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Delivery</div><div style="font-size:15px;font-weight:700;margin-top:2px;">'+fmtD(d.deliverydate)+'</div></div>');
   parts.push('<div style="background:#f5f5f5;border-radius:6px;padding:8px 10px;"><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Volume</div><div style="font-size:15px;font-weight:700;margin-top:2px;">'+(d.volume||'—')+'</div></div>');
@@ -7242,7 +7304,8 @@ function renderCalendar(){
   html += '<th style="width:180px;text-align:left;padding-left:10px;">Client / Status</th>';
   days.forEach(d=>{
     const isToday = d.getTime()===today.getTime();
-    const cls = isToday ? 'cal-today-hdr' : '';
+    const isWeekend = d.getDay()===0||d.getDay()===6;
+    const cls = isToday ? 'cal-today-hdr' : isWeekend ? 'cal-weekend-hdr' : '';
     const label = calViewMode==='week'
       ? DAY_SHORT[d.getDay()]+'<br><span style="font-size:13px;font-weight:700;">'+(d.getDate())+'</span>'
       : '<span style="font-size:11px;">'+(d.getDate())+'</span>';
@@ -7288,7 +7351,8 @@ function renderCalendar(){
     // Day cells
     days.forEach(day=>{
       const isToday = day.getTime()===today.getTime();
-      const tdCls = isToday ? 'cal-today-col' : '';
+      const isWkndCol = day.getDay()===0||day.getDay()===6;
+      const tdCls = isToday ? 'cal-today-col' : isWkndCol ? 'cal-weekend-col' : '';
       const dTime = day.getTime();
       const mTime = moveDate ? moveDate.getTime() : null;
       const dDTime = delivDate ? delivDate.getTime() : null;
