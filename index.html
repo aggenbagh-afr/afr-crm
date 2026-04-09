@@ -779,7 +779,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 </div>
 
 <!-- LEAD MODAL -->
-<div class="modal-overlay" id="leadModalOverlay" onclick="if(event.target===this)closeLeadModal()">
+<div class="modal-overlay" id="leadModalOverlay">
 <div class="modal" style="max-width:500px;">
   <div class="modal-header">
     <div class="modal-title-area">
@@ -2830,7 +2830,10 @@ function renderLeads(){
   // Apply label filter
   let active=leads.filter(l=>!l.lost && !l.qualified);
   if(leadLabelFilter!=='all'){
-    active = active.filter(l=>getLabelFromMovedate(l.movedate)===leadLabelFilter||l.label===leadLabelFilter);
+    active = active.filter(l=>{
+      const dl = l.movedate ? getLabelFromMovedate(l.movedate) : (l.label||'');
+      return dl===leadLabelFilter;
+    });
   }
   // Sort
   active = [...active].sort((a,b)=>{
@@ -2845,10 +2848,12 @@ function renderLeads(){
   const countEl=document.getElementById('leadsCount');
   if(countEl) countEl.textContent=`${active.length} active lead${active.length!==1?'s':''}${lost.length?' · '+lost.length+' lost':''}`;
   const rows=active.map(l=>{
+    // Always recalculate label dynamically from move date — never use stored l.label
+    const dynLabel = l.movedate ? getLabelFromMovedate(l.movedate) : (l.label||'');
     let lc='';
-    if(l.label==='CURRENT')lc='tag-label-current';
-    else if(l.label==='NEXT')lc='tag-label-next';
-    else if(l.label==='LATER')lc='tag-label-later';
+    if(dynLabel==='CURRENT')lc='tag-label-current';
+    else if(dynLabel==='NEXT')lc='tag-label-next';
+    else if(dynLabel==='LATER')lc='tag-label-later';
     let ac='';
     if(l.nextActivity==='Today')ac='next-today';
     else if(l.nextActivity==='Tomorrow')ac='next-tomorrow';
@@ -2858,7 +2863,7 @@ function renderLeads(){
       <td style="text-align:center;"><input type="checkbox" class="lead-check" data-id="${l.id}" ${checked} onchange="onLeadCheckChange(this)" style="cursor:pointer;accent-color:var(--accent);"></td>
       <td style="color:var(--text);font-weight:500;cursor:pointer;" onclick="openEditLead(${l.id})">${l.name}</td>
       <td style="white-space:nowrap;font-size:11px;color:var(--text2);">${l.movedate?fmtDate(l.movedate):'—'}</td>
-      <td>${l.label?`<span class="tag ${lc}" style="font-size:10px;">${l.label}</span>`:''}</td>
+      <td>${dynLabel?`<span class="tag ${lc}" style="font-size:10px;">${dynLabel}</span>`:''}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11.5px">${l.phone}</td>
       <td>${l.fromCity?l.fromCity:l.from||'—'}</td><td>${l.toCity?l.toCity:l.to||'—'}</td>
       <td><span class="tag tag-source">${l.source||'—'}</span></td>
@@ -3067,7 +3072,12 @@ function markLeadLostFromModal(){
 }
 
 function qualifyLeadFromModal(){
-  if(currentLeadId){ closeLeadModal(); qualifyLead(currentLeadId); }
+  if(!currentLeadId) return;
+  const _idToQualify = currentLeadId;
+  // Save any unsaved changes first, then qualify
+  saveLead();
+  // saveLead closes modal and clears currentLeadId, so use saved id
+  qualifyLead(_idToQualify);
 }
 
 function qualifyLead(id){
@@ -3899,7 +3909,7 @@ function doSearch(q){
     </div>`;
 
   let html='';
-  if(leadRes.length){ html+=`<div class="search-group-label">Leads</div>`; html+=leadRes.map(l=>`<div class="search-item" onclick="closeSearch();showView('leads',document.querySelector('.nav-tab[onclick*=leads]'));setTimeout(()=>highlightLeadRow(${l.id}),200)"><div class="search-item-name">${l.name}</div><div class="search-item-meta">${l.phone||''}${l.source?' · '+l.source:''}</div></div>`).join('');}
+  if(leadRes.length){ html+=`<div class="search-group-label">Leads</div>`; html+=leadRes.map(l=>`<div class="search-item" onclick="closeSearch();showView('leads',document.querySelector('.nav-tab[onclick*=leads]'));setTimeout(()=>{ highlightLeadRow(${l.id}); openEditLead(${l.id}); },250)"><div class="search-item-name">${l.name}</div><div class="search-item-meta">${l.phone||''}${l.source?' · '+l.source:''}</div></div>`).join('');}
   if(active.length){ html+=`<div class="search-group-label">Active Deals</div>`; html+=active.map(d=>dealRow(d)).join('');}
   if(won.length){    html+=`<div class="search-group-label">Won</div>`;           html+=won.map(d=>dealRow(d,'<span style="color:var(--green);font-size:10px;">✓ WON</span>')).join('');}
   if(lost.length){   html+=`<div class="search-group-label">Lost</div>`;          html+=lost.map(d=>dealRow(d,'<span style="color:var(--red);font-size:10px;">✗ LOST</span>')).join('');}
@@ -5241,10 +5251,6 @@ function copyBookingEmail(){
 
   const lines = [
     subject,
-    '',
-    'BOOKING CONFIRMATION — AFR Moves',
-    'QUO: '+(d.quo||'—')+' · INV: '+(d.inv||'—'),
-    'Transporter: '+(d.transporter||'—'),
     '',
     'CLIENT: '+d.name,
     phones||null,
@@ -6925,7 +6931,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 9;
+const DATA_VERSION = 10;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
