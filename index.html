@@ -2925,10 +2925,9 @@ function openNewLead(){
   document.getElementById('lf_movedate').value = '';
   document.getElementById('lf_activity').value = 'Today';
   document.getElementById('lf_email').value = '';
-  const nl = document.getElementById('leadNotesList'); if(nl) nl.innerHTML='';
+  const nl = document.getElementById('leadNotesList'); if(nl) nl.innerHTML='<div style="font-size:12px;color:var(--text3);padding:4px 0;">No notes yet.</div>';
+  window._newLeadNotes = []; // temp buffer for notes before save
   document.getElementById('leadModalOverlay').classList.add('open');
-  currentLeadId = id;
-  renderLeadTasks(l);
   setTimeout(()=>document.getElementById('lf_name').focus(), 100);
 }
 
@@ -2972,6 +2971,14 @@ function closeLeadModal(){
 function saveLead(){
   const name = document.getElementById('lf_name').value.trim();
   if(!name){ document.getElementById('lf_name').focus(); return; }
+  const src = document.getElementById('lf_source').value;
+  if(!src){
+    const sel = document.getElementById('lf_source');
+    sel.style.borderColor='#ef4444';
+    sel.focus();
+    setTimeout(()=>sel.style.borderColor='',2000);
+    return;
+  }
   if(currentLeadId){
     let l = leads.find(x=>x.id===currentLeadId);
     if(!l){
@@ -3016,10 +3023,12 @@ function saveLead(){
       label: getLabelFromMovedate(document.getElementById('lf_movedate').value),
       nextActivity: document.getElementById('lf_activity').value,
       email: document.getElementById('lf_email').value,
+      notes: window._newLeadNotes || [],
       lost: false,
       createdDate: new Date().toISOString().slice(0,10),
       _ts: Date.now(),
     });
+    window._newLeadNotes = [];
   }
   closeLeadModal();
   const savedLead = leads.find(x=>x.name===name);
@@ -3183,14 +3192,25 @@ function addLeadNote(){
   if(!input) return;
   const text = input.value.trim();
   if(!text) return;
+  const note = { text, at: Date.now(), by: localStorage.getItem('afr_home_person')||'' };
+  if(!currentLeadId){
+    // New lead — buffer notes until save
+    if(!window._newLeadNotes) window._newLeadNotes = [];
+    window._newLeadNotes.push(note);
+    input.value = '';
+    // Render from buffer
+    const el = document.getElementById('leadNotesList');
+    if(el) el.innerHTML = window._newLeadNotes.slice().reverse().map(n=>`
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;">
+        <div style="font-size:12px;color:var(--text);white-space:pre-wrap;">${n.text}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;">Just now</div>
+      </div>`).join('');
+    return;
+  }
   const l = leads.find(x=>x.id===currentLeadId);
   if(!l) return;
   if(!l.notes) l.notes = [];
-  l.notes.push({
-    text,
-    at: Date.now(),
-    by: localStorage.getItem('afr_home_person') || ''
-  });
+  l.notes.push(note);
   l._ts = Date.now();
   STORE.saveLead(l);
   input.value = '';
@@ -5026,8 +5046,8 @@ function buildQuoteBlock(d){
   const volLine = vol && vol!=='—'
     ? vol.replace(/\s+ft/gi,'ft') + (d.dedicated ? ' DEDICATED TRUCK/TRAILER' : '')
     : (d.dedicated ? 'DEDICATED TRUCK/TRAILER' : '');
-  const from = [d.fromCity, d.fromSuburb].filter(Boolean).join(', ') + accessStr(d.fromAccess||[]);
-  const to   = [d.toCity,   d.toSuburb  ].filter(Boolean).join(', ') + accessStr(d.toAccess||[]);
+  const from = [d.fromSuburb, d.fromCity, d.fromProvince].filter(Boolean).join(', ') + accessStr(d.fromAccess||[]);
+  const to   = [d.toSuburb,   d.toCity,   d.toProvince  ].filter(Boolean).join(', ') + accessStr(d.toAccess||[]);
   const route = (from||'?') + '  to  ' + (to||'?');
   const date  = fmtDateLong(d.movedate);
   const reqs = [];
@@ -6931,7 +6951,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 10;
+const DATA_VERSION = 11;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
