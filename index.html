@@ -99,8 +99,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 /* CARD */
 .card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px;cursor:pointer;transition:all .15s;position:relative;}
 .card:hover{border-color:var(--accent);background:var(--surface3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
-.card.has-task{border-color:rgba(239,68,68,.6);box-shadow:0 0 0 2px rgba(239,68,68,.2);}
-.card.has-task:hover{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.3);}
+.card.has-task-overdue{border-color:rgba(239,68,68,.6);box-shadow:0 0 0 2px rgba(239,68,68,.2);}
+.card.has-task-overdue:hover{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.3);}
+.card.has-task-today{border-color:rgba(249,115,22,.6);box-shadow:0 0 0 2px rgba(249,115,22,.2);}
+.card.has-task-today:hover{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,.3);}
+.card.has-task-upcoming{border-color:rgba(245,158,11,.5);box-shadow:0 0 0 2px rgba(245,158,11,.15);}
+.card.has-task-upcoming:hover{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(245,158,11,.25);}
 .card-company{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:2px;}
 .card-name{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:5px;padding-right:12px;line-height:1.3;}
 .card-meta{display:flex;flex-direction:column;gap:3px;}
@@ -2098,8 +2102,16 @@ function cardHTML(d){
   const bcHtml=pipeStages.map(s=>`<span class="bc-step${s.id===d.stage?' current':''}">${s.label.split(' ')[0]}</span>${s.id!==pipeStages[pipeStages.length-1].id?'<span class="bc-sep">›</span>':''}`).join('');
 
   const _isInternal = d.name==='AFR Internal — Team';
-  const _hasOutstandingTask = (d.tasks||[]).some(t=>!t.done);
-  return `<div class="card${_isInternal?' internal-pinned':''}${_hasOutstandingTask?' has-task':''}" draggable="${!_isInternal}" data-id="${d.id}"
+  const _pendingTasks = (d.tasks||[]).filter(t=>!t.done);
+  const _todayMid=(()=>{const x=new Date();x.setHours(0,0,0,0);return x;})();
+  const _taskClass=(()=>{
+    if(!_pendingTasks.length) return '';
+    const _withDue = _pendingTasks.filter(t=>t.due);
+    if(_withDue.some(t=>{const d=new Date(t.due);d.setHours(0,0,0,0);return d<_todayMid;})) return ' has-task-overdue';
+    if(_withDue.some(t=>{const d=new Date(t.due);d.setHours(0,0,0,0);return d.getTime()===_todayMid.getTime();})) return ' has-task-today';
+    return ' has-task-upcoming';
+  })();
+  return `<div class="card${_isInternal?' internal-pinned':''}${_taskClass}" draggable="${!_isInternal}" data-id="${d.id}"
     ondragstart="${_isInternal?'event.preventDefault()':'event.dataTransfer.setData(\'text/plain\',String('+d.id+'));window._dragId='+d.id+';this.style.opacity=\'.4\''}"
     ondragend="this.style.opacity='1';document.querySelectorAll('.col').forEach(c=>c.classList.remove('drag-over'))"
     onclick="openDeal(${d.id})">
@@ -6094,15 +6106,15 @@ function renderPinnedBoard(){
     return;
   }
   el.innerHTML = tasks.map(t=>{
-    const _td=new Date(); _td.setHours(0,0,0,0); const _dd=t.due?new Date(new Date(t.due).setHours(0,0,0,0)):null; const overdue = _dd && _dd < _td;
-    return `<div class="task-item${overdue?' overdue':''}" style="background:var(--surface);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:2px;cursor:pointer;" onclick="openDeal(${d.id})">
+    const _td=new Date(); _td.setHours(0,0,0,0); const _dd=t.due?new Date(new Date(t.due).setHours(0,0,0,0)):null; const overdue = _dd && _dd < _td; const dueToday = _dd && _dd.getTime()===_td.getTime();
+    return `<div class="task-item${overdue?' overdue':dueToday?' due-today':''}" style="background:var(--surface);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:2px;cursor:pointer;" onclick="openDeal(${d.id})">
       <div class="task-tick" onclick="event.stopPropagation();tickPinnedTask(${t.id})" title="Mark done">✓</div>
       <span class="task-cat">${t.category||'📋'}</span>
       <div class="task-body">
         <div class="task-title">${t.note}</div>
         <div class="task-meta">
           <span style="color:var(--accent);">@${t.assignee}</span>
-          ${t.due?` · <span class="task-due${overdue?' style=\"color:#ef4444;font-weight:700;\"':''}">${fmtDate(t.due)}</span>`:''}
+          ${t.due?` · <span class="task-due${overdue?' style=\"color:#ef4444;font-weight:700;\"':dueToday?' style=\"color:#f97316;font-weight:700;\"':''}">${fmtDate(t.due)}</span>`:''}
         </div>
       </div>
     </div>`;
@@ -6190,9 +6202,25 @@ function updateTaskNavBadge(){
   const badge = document.getElementById('tasksNavBadge');
   if(!badge) return;
   const person = tasksViewPerson;
+  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+  const todayEnd   = new Date(); todayEnd.setHours(23,59,59,999);
   let count = 0;
-  deals.forEach(d=>(d.tasks||[]).forEach(t=>{ if(!t.done&&(person==='All'||t.assignee===person)) count++; }));
-  leads.forEach(l=>(l.tasks||[]).forEach(t=>{ if(!t.done&&(person==='All'||t.assignee===person)) count++; }));
+  function isDueToday(t){
+    if(!t.due) return false;
+    const d = new Date(t.due); d.setHours(0,0,0,0);
+    return d.getTime()===todayStart.getTime();
+  }
+  function isOverdue(t){
+    if(!t.due) return false;
+    const d = new Date(t.due); d.setHours(0,0,0,0);
+    return d < todayStart;
+  }
+  deals.forEach(d=>(d.tasks||[]).forEach(t=>{
+    if(!t.done&&(person==='All'||t.assignee===person)&&(isDueToday(t)||isOverdue(t))) count++;
+  }));
+  leads.forEach(l=>(l.tasks||[]).forEach(t=>{
+    if(!t.done&&(person==='All'||t.assignee===person)&&(isDueToday(t)||isOverdue(t))) count++;
+  }));
   if(count>0){ badge.textContent=count; badge.style.display='inline'; }
   else { badge.style.display='none'; }
 }
@@ -6246,10 +6274,10 @@ function renderTasksView(){
     const today    = allTasks.filter(t => { if(!t.due) return false; const d=new Date(t.due); d.setHours(0,0,0,0); return d.getTime()===todayStart.getTime(); });
     const upcoming = allTasks.filter(t => { if(!t.due) return true; const d=new Date(t.due); d.setHours(0,0,0,0); return d > todayStart; });
 
-    const renderGroup = (tasks, label, color) => tasks.length ? `
+    const renderGroup = (tasks, label, color, groupType) => tasks.length ? `
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:${color};margin:12px 0 4px;">${label} (${tasks.length})</div>
       ${tasks.map(t => `
-        <div class="task-item${t.due&&new Date(t.due)<now?' overdue':''}" onclick="openDeal(${t.sourceId})" style="cursor:pointer;border-radius:var(--radius-sm);margin-bottom:2px;">
+        <div class="task-item${groupType==='overdue'?' overdue':groupType==='today'?' due-today':''}" onclick="openDeal(${t.sourceId})" style="cursor:pointer;border-radius:var(--radius-sm);margin-bottom:2px;">
           <div class="task-tick" onclick="event.stopPropagation();tickTaskFromView(${t.id},'${t.sourceType}',${t.sourceId})" title="Mark done">✓</div>
           <span class="task-cat">${t.category||'📋'}</span>
           <div class="task-body">
@@ -6257,15 +6285,15 @@ function renderTasksView(){
             <div class="task-meta">
               <span style="color:var(--accent);">@${t.assignee}</span> ·
               <span style="color:var(--text3);">${t.sourceName}</span>
-              ${t.due?` · <span class="task-due">${fmtDate(t.due)}</span>`:''}
+              ${t.due?` · <span class="task-due" style="color:${groupType==='overdue'?'#ef4444':groupType==='today'?'#f97316':groupType==='upcoming'?'#f59e0b':'var(--text3)'};font-weight:${groupType==='overdue'||groupType==='today'?'700':'400'};">${fmtDate(t.due)}</span>`:''}
             </div>
           </div>
         </div>`).join('')}` : '';
 
     content.innerHTML =
-      renderGroup(overdue,  '🔴 Overdue', '#ef4444') +
-      renderGroup(today.filter(t=>!overdue.includes(t)), '📅 Due Today', '#f59e0b') +
-      renderGroup(upcoming.filter(t=>!overdue.includes(t)&&!today.includes(t)), 'Upcoming', 'var(--text3)');
+      renderGroup(overdue,  '🔴 Overdue', '#ef4444', 'overdue') +
+      renderGroup(today.filter(t=>!overdue.includes(t)), '📅 Due Today', '#f97316', 'today') +
+      renderGroup(upcoming.filter(t=>!overdue.includes(t)&&!today.includes(t)), '🟡 Upcoming', '#f59e0b', 'upcoming');
 
   } else {
     // Mentions tab
@@ -6983,7 +7011,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 14;
+const DATA_VERSION = 16;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
