@@ -2111,7 +2111,7 @@ function cardHTML(d){
         ? `<div class="card-row"><span class="icon">🚛</span>${[d.transporter, d.volume?formatVolume(d.volume):null].filter(Boolean).join(' · ')}</div>`
         : ''}
       ${d.shuttle==='Yes'&&(d.shuttle_from_who||d.shuttle_to_who)?`<div class="card-row" style="color:var(--purple);font-size:10.5px;"><span class="icon">🚐</span>${[d.shuttle_from_who?(d.shuttle_from_who+(d.shuttle_from_note?' ('+d.shuttle_from_note+')':'')+' [FROM]'):'', d.shuttle_to_who?(d.shuttle_to_who+(d.shuttle_to_note?' ('+d.shuttle_to_note+')':'')+' [TO]'):''].filter(Boolean).join(' · ')}</div>`:''}
-      ${d.movedate?`<div class="card-row"><span class="icon">📅</span>${fmtDate(d.movedate)}${d.movedate_end&&d.movedate_end!==d.movedate?' – '+fmtDate(d.movedate_end):''}${d.deliverydate?' → '+fmtDate(d.deliverydate):''}</div>`:''}
+      ${d.movedate?`<div class="card-row"><span class="icon">📅</span>${fmtDate(d.movedate)}${d.movedate_end&&d.movedate_end!==d.movedate?' – '+fmtDate(d.movedate_end):''}${d.deliverydate&&d.deliverydate!==d.movedate?' → '+fmtDate(d.deliverydate):''}</div>`:''}
       ${d.value?`<div class="card-row"><span class="icon">💰</span>${zar(d.value)}${profit>0?' <span style="color:var(--green);font-size:10px;">(+'+zar(profit)+')</span>':''}</div>`:''}
       ${d.quo?`<div class="card-row"><span class="icon">🔖</span>QUO ${d.quo}${d.inv?' · INV '+d.inv:''}</div>`:''}
     </div>
@@ -6983,7 +6983,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 12;
+const DATA_VERSION = 13;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
