@@ -434,9 +434,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
     <button onclick="clearLeadSelection()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);padding:4px 10px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">✕ Cancel</button>
   </div>
   <div class="leads-view"><table class="leads-table" id="leadsTable"><colgroup>
-    <col id="leads-col-check"    style="width:32px">
-    <col id="leads-col-name"     style="width:160px">
-    <col id="leads-col-movedate" style="width:100px">
+    <col id="leads-col-check"       style="width:32px">
+    <col id="leads-col-name"        style="width:160px">
+    <col id="leads-col-createddate" style="width:90px">
+    <col id="leads-col-movedate"    style="width:100px">
     <col id="leads-col-label"    style="width:90px">
     <col id="leads-col-phone"    style="width:120px">
     <col id="leads-col-fromCity" style="width:120px">
@@ -447,6 +448,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
   </colgroup><thead><tr>
     <th style="position:relative;width:32px;text-align:center;"><input type="checkbox" id="leadSelectAll" onchange="toggleSelectAllLeads(this.checked)" style="cursor:pointer;accent-color:var(--accent);"></th>
     <th onclick="sortLeads('name')" class="sortable-th" style="position:relative;cursor:pointer;">Name<span id="lsort-name"></span><span class="col-resizer" onmousedown="startResize(event,'leads-col-name','leads')"></span></th>
+    <th onclick="sortLeads('createdDate')" class="sortable-th" style="position:relative;cursor:pointer;">Created<span id="lsort-createdDate"></span><span class="col-resizer" onmousedown="startResize(event,'leads-col-createddate','leads')"></span></th>
     <th onclick="sortLeads('movedate')" class="sortable-th" style="position:relative;cursor:pointer;">Move Date<span id="lsort-movedate"> ↑</span><span class="col-resizer" onmousedown="startResize(event,'leads-col-movedate','leads')"></span></th>
     <th style="position:relative;">
       <select onchange="leadLabelFilter=this.value;renderLeads()" style="font-size:10px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--text2);padding:1px 3px;cursor:pointer;" title="Filter by label">
@@ -2887,6 +2889,7 @@ function renderLeads(){
     return `<tr data-lead-id="${l.id}">
       <td style="text-align:center;"><input type="checkbox" class="lead-check" data-id="${l.id}" ${checked} onchange="onLeadCheckChange(this)" style="cursor:pointer;accent-color:var(--accent);"></td>
       <td style="color:var(--text);font-weight:500;cursor:pointer;" onclick="openEditLead(${l.id})">${l.name}</td>
+      <td style="white-space:nowrap;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;">${l.createdDate?fmtDate(l.createdDate):'—'}</td>
       <td style="white-space:nowrap;font-size:11px;color:var(--text2);">${l.movedate?fmtDate(l.movedate):'—'}</td>
       <td>${dynLabel?`<span class="tag ${lc}" style="font-size:10px;">${dynLabel}</span>`:''}</td>
       <td style="font-family:'DM Mono',monospace;font-size:11.5px">${l.phone}</td>
@@ -2900,8 +2903,8 @@ function renderLeads(){
       </td>
     </tr>`;
   }).join('');
-  tbody.innerHTML=rows||'<tr><td colspan="10" style="color:var(--text3);padding:20px;text-align:center;">No leads yet — click + Lead to add one</td></tr>';
-  loadColWidths('leads', ['leads-col-name','leads-col-movedate','leads-col-label','leads-col-phone','leads-col-fromCity','leads-col-toCity','leads-col-source','leads-col-activity','leads-col-actions']);
+  tbody.innerHTML=rows||'<tr><td colspan="11" style="color:var(--text3);padding:20px;text-align:center;">No leads yet — click + Lead to add one</td></tr>';
+  loadColWidths('leads', ['leads-col-name','leads-col-createddate','leads-col-movedate','leads-col-label','leads-col-phone','leads-col-fromCity','leads-col-toCity','leads-col-source','leads-col-activity','leads-col-actions']);
   _updateLeadBulkBar();
 }
 
@@ -7011,7 +7014,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 16;
+const DATA_VERSION = 17;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
