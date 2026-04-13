@@ -6094,7 +6094,7 @@ function renderPinnedBoard(){
     return;
   }
   el.innerHTML = tasks.map(t=>{
-    const overdue = t.due && new Date(t.due) < now;
+    const _td=new Date(); _td.setHours(0,0,0,0); const _dd=t.due?new Date(new Date(t.due).setHours(0,0,0,0)):null; const overdue = _dd && _dd < _td;
     return `<div class="task-item${overdue?' overdue':''}" style="background:var(--surface);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:2px;cursor:pointer;" onclick="openDeal(${d.id})">
       <div class="task-tick" onclick="event.stopPropagation();tickPinnedTask(${t.id})" title="Mark done">✓</div>
       <span class="task-cat">${t.category||'📋'}</span>
@@ -6244,7 +6244,7 @@ function renderTasksView(){
     const todayStart = new Date(now); todayStart.setHours(0,0,0,0);
     const overdue  = allTasks.filter(t => { if(!t.due) return false; const d=new Date(t.due); d.setHours(0,0,0,0); return d < todayStart; });
     const today    = allTasks.filter(t => { if(!t.due) return false; const d=new Date(t.due); d.setHours(0,0,0,0); return d.getTime()===todayStart.getTime(); });
-    const upcoming = allTasks.filter(t => !t.due || new Date(t.due) >= now);
+    const upcoming = allTasks.filter(t => { if(!t.due) return true; const d=new Date(t.due); d.setHours(0,0,0,0); return d > todayStart; });
 
     const renderGroup = (tasks, label, color) => tasks.length ? `
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:${color};margin:12px 0 4px;">${label} (${tasks.length})</div>
@@ -6983,7 +6983,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 13;
+const DATA_VERSION = 14;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
