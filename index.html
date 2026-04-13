@@ -141,7 +141,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:720px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6);display:flex;flex-direction:column;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:720px;max-width:96vw;max-height:92vh;overflow-y:auto;overflow-x:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6);display:flex;flex-direction:column;}
 .modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;}
 .modal-title-area{flex:1;}
 .modal-company-input{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);background:none;border:none;outline:none;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
@@ -269,6 +269,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .task-item{display:flex;align-items:flex-start;gap:8px;padding:10px 10px;border-bottom:1px solid var(--border);transition:background .15s;}
 .task-item:hover{background:var(--surface3);}
 .task-item.overdue .task-due{color:#ef4444;font-weight:700;}
+.task-item.due-today .task-due{color:#f59e0b;font-weight:700;}
 .task-tick{width:18px;height:18px;border-radius:50%;border:2px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;}
 .task-tick:hover{border-color:#22c55e;}
 .task-tick.done{background:#22c55e;border-color:#22c55e;color:#fff;}
@@ -794,26 +795,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
         <div class="field field-full"><div class="field-label">Full Name</div><input type="text" id="lf_name" placeholder="Client name"></div>
         <div class="field"><div class="field-label">Phone</div><input type="tel" id="lf_phone" placeholder="0xx xxx xxxx"></div>
         <div class="field"><div class="field-label">Email</div><input type="email" id="lf_email" placeholder="client@email.com"></div>
+        <div class="field"><div class="field-label">Phone 2</div><input type="tel" id="lf_phone2" placeholder="0xx xxx xxxx"></div>
+        <div class="field"><div class="field-label">Email 2</div><input type="email" id="lf_email2" placeholder="client@email.com"></div>
         <div class="field"><div class="field-label">Source</div>
           <div style="display:flex;gap:5px;align-items:center;">
             <select id="lf_source" style="flex:1;"></select>
             <button type="button" onclick="addCustomSource()" title="Add new source" style="background:var(--surface2);border:1px solid var(--border2);color:var(--accent);border-radius:var(--radius-sm);padding:5px 8px;font-size:12px;cursor:pointer;white-space:nowrap;">+ Source</button>
           </div>
         </div>
-        <div class="field-full" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;align-items:end;">
-          <div class="field"><div class="field-label">From Street</div><input type="text" id="lf_from" placeholder="Street address"></div>
-          <div class="field"><div class="field-label">From Suburb</div><input type="text" id="lf_from_suburb" placeholder="Suburb"></div>
+        <div class="field-full" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;align-items:end;min-width:0;">
+          <div class="field" style="min-width:0;overflow:hidden;"><div class="field-label">From Street</div><input type="text" id="lf_from" placeholder="Street address" style="min-width:0;width:100%;"></div>
+          <div class="field" style="min-width:0;overflow:hidden;"><div class="field-label">From Suburb</div><input type="text" id="lf_from_suburb" placeholder="Suburb" style="min-width:0;width:100%;"></div>
           <div class="field"><div class="field-label">From City <span style="color:#ef4444;">*</span></div><input type="text" id="lf_from_city" placeholder="e.g. Cape Town" style="border-color:var(--border);"></div>
           <div class="field"><div class="field-label">Province</div><select id="lf_from_province" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;padding:6px 8px;font-family:'DM Sans',sans-serif;width:100%;"><option value="">— Province —</option><option>Western Cape</option><option>Eastern Cape</option><option>Northern Cape</option><option>North West</option><option>Free State</option><option>KwaZulu-Natal</option><option>Gauteng</option><option>Mpumalanga</option><option>Limpopo</option></select></div>
         </div>
-        <div class="field-full" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;align-items:end;">
-          <div class="field"><div class="field-label">To Street</div><input type="text" id="lf_to" placeholder="Street address"></div>
-          <div class="field"><div class="field-label">To Suburb</div><input type="text" id="lf_to_suburb" placeholder="Suburb"></div>
+        <div class="field-full" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;align-items:end;min-width:0;">
+          <div class="field" style="min-width:0;overflow:hidden;"><div class="field-label">To Street</div><input type="text" id="lf_to" placeholder="Street address" style="min-width:0;width:100%;"></div>
+          <div class="field" style="min-width:0;overflow:hidden;"><div class="field-label">To Suburb</div><input type="text" id="lf_to_suburb" placeholder="Suburb" style="min-width:0;width:100%;"></div>
           <div class="field"><div class="field-label">To City <span style="color:#ef4444;">*</span></div><input type="text" id="lf_to_city" placeholder="e.g. Johannesburg" style="border-color:var(--border);"></div>
           <div class="field"><div class="field-label">Province</div><select id="lf_to_province" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;padding:6px 8px;font-family:'DM Sans',sans-serif;width:100%;"><option value="">— Province —</option><option>Western Cape</option><option>Eastern Cape</option><option>Northern Cape</option><option>North West</option><option>Free State</option><option>KwaZulu-Natal</option><option>Gauteng</option><option>Mpumalanga</option><option>Limpopo</option></select></div>
         </div>
-        <div class="field"><div class="field-label">Move Date</div>
-          <input type="date" id="lf_movedate" onchange="autoLabelLead(this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;padding:6px 9px;font-size:12px;width:100%;">
+        <div class="field"><div class="field-label">Move Date <span style="font-size:10px;color:var(--text3);font-weight:400;">— or range</span></div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="date" id="lf_movedate" onchange="autoLabelLead(this.value)" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;padding:6px 9px;font-size:12px;">
+            <span style="font-size:11px;color:var(--text3);">to</span>
+            <input type="date" id="lf_movedate_end" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;padding:6px 9px;font-size:12px;">
+          </div>
         </div>
         <div class="field"><div class="field-label">Next Activity</div>
           <select id="lf_activity">
@@ -1068,7 +1075,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
               </label>
             </div>
           </div>
-          <div class="field"><div class="field-label">Collection Date</div><input type="date" id="f_movedate"></div>
+          <div class="field"><div class="field-label">Collection Date <span style="font-size:10px;color:var(--text3);font-weight:400;">— or range</span></div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <input type="date" id="f_movedate" style="flex:1;">
+              <span style="font-size:11px;color:var(--text3);">to</span>
+              <input type="date" id="f_movedate_end" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 9px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;">
+            </div>
+          </div>
           <div class="field"><div class="field-label">Delivery Date</div><input type="date" id="f_deliverydate"></div>
           <div class="field"><div class="field-label" style="color:#60a5fa;">Booked Date <span style="font-size:9px;color:var(--text3);font-weight:400;">(reports month)</span></div><input type="date" id="f_bookeddate" style="border-color:rgba(96,165,250,.3);"></div>
         </div>
@@ -2098,7 +2111,7 @@ function cardHTML(d){
         ? `<div class="card-row"><span class="icon">🚛</span>${[d.transporter, d.volume?formatVolume(d.volume):null].filter(Boolean).join(' · ')}</div>`
         : ''}
       ${d.shuttle==='Yes'&&(d.shuttle_from_who||d.shuttle_to_who)?`<div class="card-row" style="color:var(--purple);font-size:10.5px;"><span class="icon">🚐</span>${[d.shuttle_from_who?(d.shuttle_from_who+(d.shuttle_from_note?' ('+d.shuttle_from_note+')':'')+' [FROM]'):'', d.shuttle_to_who?(d.shuttle_to_who+(d.shuttle_to_note?' ('+d.shuttle_to_note+')':'')+' [TO]'):''].filter(Boolean).join(' · ')}</div>`:''}
-      ${d.movedate?`<div class="card-row"><span class="icon">📅</span>${fmtDate(d.movedate)}${d.deliverydate?' → '+fmtDate(d.deliverydate):''}</div>`:''}
+      ${d.movedate?`<div class="card-row"><span class="icon">📅</span>${fmtDate(d.movedate)}${d.movedate_end&&d.movedate_end!==d.movedate?' – '+fmtDate(d.movedate_end):''}${d.deliverydate?' → '+fmtDate(d.deliverydate):''}</div>`:''}
       ${d.value?`<div class="card-row"><span class="icon">💰</span>${zar(d.value)}${profit>0?' <span style="color:var(--green);font-size:10px;">(+'+zar(profit)+')</span>':''}</div>`:''}
       ${d.quo?`<div class="card-row"><span class="icon">🔖</span>QUO ${d.quo}${d.inv?' · INV '+d.inv:''}</div>`:''}
     </div>
@@ -2913,6 +2926,8 @@ function openNewLead(){
   const _lb2 = document.getElementById('leadLostBtn'); if(_lb2) _lb2.style.display='none';
   document.getElementById('lf_name').value = '';
   document.getElementById('lf_phone').value = '';
+  document.getElementById('lf_phone2').value = '';
+  document.getElementById('lf_email2').value = '';
   populateSources('');
   document.getElementById('lf_from').value = '';
   document.getElementById('lf_from_city').value = '';
@@ -2923,6 +2938,7 @@ function openNewLead(){
   document.getElementById('lf_to_suburb').value = '';
   const _ltpc=document.getElementById('lf_to_province'); if(_ltpc) _ltpc.value='';
   document.getElementById('lf_movedate').value = '';
+  document.getElementById('lf_movedate_end').value = '';
   document.getElementById('lf_activity').value = 'Today';
   document.getElementById('lf_email').value = '';
   const nl = document.getElementById('leadNotesList'); if(nl) nl.innerHTML='<div style="font-size:12px;color:var(--text3);padding:4px 0;">No notes yet.</div>';
@@ -2942,7 +2958,9 @@ function openEditLead(id){
   const _lostBtn = document.getElementById('leadLostBtn');
   if(_lostBtn) _lostBtn.style.display = (l.lost||l.qualified) ? 'none' : 'flex';
   document.getElementById('lf_name').value = l.name;
-  document.getElementById('lf_phone').value = l.phone;
+  document.getElementById('lf_phone').value = l.phone||'';
+  document.getElementById('lf_phone2').value = l.phone2||'';
+  document.getElementById('lf_email2').value = l.email2||'';
   populateSources(l.source||'');
   document.getElementById('lf_from').value = l.from||'';
   document.getElementById('lf_from_city').value = l.fromCity||'';
@@ -2953,6 +2971,7 @@ function openEditLead(id){
   document.getElementById('lf_to_suburb').value = l.toSuburb||'';
   const _ltp=document.getElementById('lf_to_province'); if(_ltp) _ltp.value=l.toProvince||'';
   document.getElementById('lf_movedate').value = l.movedate||'';
+  document.getElementById('lf_movedate_end').value = l.movedate_end||'';
   document.getElementById('lf_email').value = l.email||'';
   document.getElementById('lf_activity').value = l.nextActivity||'Today';
   document.getElementById('leadModalOverlay').classList.add('open');
@@ -2993,6 +3012,9 @@ function saveLead(){
       function _lapply(field, val){ if(String(val||'')!==String(lsnap[field]||'')) l[field]=val; }
       _lapply('name',         name);
       _lapply('phone',        _lv('lf_phone'));
+      _lapply('phone2',       _lv('lf_phone2'));
+      _lapply('email2',       _lv('lf_email2'));
+      _lapply('movedate_end', _lv('lf_movedate_end'));
       _lapply('source',       _lv('lf_source'));
       _lapply('from',         _lv('lf_from'));
       _lapply('fromCity',     _lv('lf_from_city').trim());
@@ -3012,6 +3034,9 @@ function saveLead(){
       id: Date.now(),
       name,
       phone: document.getElementById('lf_phone').value,
+      phone2: document.getElementById('lf_phone2')?.value||'',
+      email2: document.getElementById('lf_email2')?.value||'',
+      movedate_end: document.getElementById('lf_movedate_end')?.value||'',
       source: document.getElementById('lf_source').value,
       from: document.getElementById('lf_from').value,
       fromCity: document.getElementById('lf_from_city').value.trim(),
@@ -3100,6 +3125,7 @@ function qualifyLead(id){
     to:l.to||'', toCity:l.toCity||(l.to?l.to.split(',')[0].trim():''),
     toSuburb:l.toSuburb||'', toProvince:l.toProvince||'',
     movedate:l.movedate||'',
+    movedate_end:l.movedate_end||'',
     fromLeadId: l.id,
     tasks: JSON.parse(JSON.stringify(l.tasks||[])),
     dealNotes: JSON.parse(JSON.stringify(l.notes||[])), // structured notes carry across
@@ -3779,9 +3805,12 @@ function removeTask(taskId, isDeal){
 function taskItemHTML(t, isDeal){
   const now = new Date();
   const due = t.due ? new Date(t.due) : null;
-  const overdue = due && !t.done && due < now;
+  const todayMidnight = new Date(now); todayMidnight.setHours(0,0,0,0);
+  const dueMidnight = due ? new Date(due.getFullYear(), due.getMonth(), due.getDate()) : null;
+  const overdue = dueMidnight && !t.done && dueMidnight < todayMidnight;
+  const dueToday = dueMidnight && !t.done && dueMidnight.getTime()===todayMidnight.getTime();
   const dueStr  = due ? fmtDate(t.due) : '';
-  return `<div class="task-item${t.done?' done':''}${overdue?' overdue':''}">
+  return `<div class="task-item${t.done?' done':''}${overdue?' overdue':dueToday?' due-today':''}">
     <div class="task-tick${t.done?' done':''}" onclick="tickTask(${t.id},${isDeal})" title="${t.done?'Mark undone':'Mark done'}">
       ${t.done?'✓':''}
     </div>
@@ -3790,7 +3819,7 @@ function taskItemHTML(t, isDeal){
       <div class="task-title" style="${t.done?'text-decoration:line-through;color:var(--text3);':''}">${t.note}</div>
       <div class="task-meta">
         ${t.assignee?`<span style="color:var(--accent);">@${t.assignee}</span> · `:''}
-        ${dueStr?`<span class="task-due${overdue?' overdue':''}">${overdue?'⚠ Overdue: ':'Due: '}${dueStr}</span>`:''}
+        ${dueStr?`<span class="task-due${overdue?' overdue':dueToday?' due-today':''}">` + (overdue?'⚠ Overdue: ':dueToday?'⏰ Due Today: ':'Due: ') + `${dueStr}</span>`:''}
         ${t.done&&t.outcome?`<span style="color:#22c55e;"> · ${t.outcome}</span>`:''}
         ${t.done&&t.doneAt?`<span style="color:var(--text3);"> · Done ${fmtDate(t.doneAt)}</span>`:''}
       </div>
@@ -4001,6 +4030,7 @@ function openDeal(id){
     document.getElementById('f_own_driver').value='';
   }
   document.getElementById('f_movedate').value=d.movedate;
+  const _fme=document.getElementById('f_movedate_end'); if(_fme) _fme.value=d.movedate_end||'';
   document.getElementById('f_bookeddate').value=d.bookedDate||'';
   document.getElementById('f_deliverydate').value=d.deliverydate;
   renderQuotes(d.quotes||[{amt:d.value||'',date:''}], d.selectedQuote||0);
@@ -4011,15 +4041,15 @@ function openDeal(id){
   document.getElementById('costLineAmt').value='';
   document.getElementById('f_packing').value=d.packing||'';
   document.getElementById('f_pack_gen_boxes').value=d.pack_gen_boxes||'';
-  // Apply blue halo to filled packing fields
-  ['f_pack_gen_boxes','f_pack_ward_boxes','f_pack_tv_boxes','f_pack_bubble','f_pack_covers','f_pack_crating'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.classList.toggle('pack-field-filled', (el.value||'').trim()!=='');
-  });
   document.getElementById('f_pack_ward_boxes').value=d.pack_ward_boxes||'';
   document.getElementById('f_pack_tv_boxes').value=d.pack_tv_boxes||'';
   document.getElementById('f_pack_bubble').value=d.pack_bubble||'';
   document.getElementById('f_pack_covers').value=d.pack_covers||'';
   document.getElementById('f_pack_crating').value=d.pack_crating||'';
+  // Apply blue halo AFTER values are set
+  ['f_pack_gen_boxes','f_pack_ward_boxes','f_pack_tv_boxes','f_pack_bubble','f_pack_covers','f_pack_crating'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.classList.toggle('pack-field-filled', (el.value||'').trim()!=='');
+  });
   document.getElementById('f_unpacking_details').value=d.unpacking_details||'';
   document.getElementById('f_vehicle_details').value=d.vehicle_details||'';
   const cvat=document.getElementById('f_company_vat'); if(cvat)cvat.value=d.company_vat||'';
@@ -4455,6 +4485,7 @@ function saveDeal(){
   const newDedicated = !!(document.getElementById('f_dedicated')?.checked);
   d.dedicated = newDedicated;
   _apply('movedate',   _fv('f_movedate'));
+  d.movedate_end = (document.getElementById('f_movedate_end')?.value)||'';
   const manualBooked = document.getElementById('f_bookeddate').value;
   if(manualBooked) d.bookedDate = manualBooked;
   else if(!d.bookedDate && d.stage==='booked') d.bookedDate = new Date().toISOString().slice(0,10);
@@ -6210,8 +6241,9 @@ function renderTasksView(){
       return;
     }
 
-    const overdue  = allTasks.filter(t => t.due && new Date(t.due) < now);
-    const today    = allTasks.filter(t => t.due && fmtDate(t.due)===fmtDate(new Date().toISOString().slice(0,10)));
+    const todayStart = new Date(now); todayStart.setHours(0,0,0,0);
+    const overdue  = allTasks.filter(t => { if(!t.due) return false; const d=new Date(t.due); d.setHours(0,0,0,0); return d < todayStart; });
+    const today    = allTasks.filter(t => { if(!t.due) return false; const d=new Date(t.due); d.setHours(0,0,0,0); return d.getTime()===todayStart.getTime(); });
     const upcoming = allTasks.filter(t => !t.due || new Date(t.due) >= now);
 
     const renderGroup = (tasks, label, color) => tasks.length ? `
@@ -6951,7 +6983,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 11;
+const DATA_VERSION = 12;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
