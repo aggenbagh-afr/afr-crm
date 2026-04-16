@@ -90,6 +90,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .batch-name{font-size:10px;font-weight:700;color:#818cf8;flex:1;cursor:pointer;outline:none;background:none;border:none;font-family:'DM Sans',sans-serif;padding:0;}
 .batch-name:focus{background:var(--surface2);border-radius:3px;padding:1px 4px;}
 .batch-cards{padding:6px;display:flex;flex-direction:column;gap:4px;min-height:80px;}
+.batch-cards.batch-drop-target{border:2px dashed rgba(99,102,241,.7);border-radius:4px;background:rgba(99,102,241,.08);}
 .batch-drop-target{border:2px dashed rgba(99,102,241,.4);border-radius:4px;}
 .col-cards::-webkit-scrollbar{width:3px;}
 .col-cards::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
@@ -1968,10 +1969,7 @@ function renderBatchedCards(stageDeals){
       .sort((a,b)=>{ if(!a.movedate&&!b.movedate)return 0; if(!a.movedate)return 1; if(!b.movedate)return -1; return a.movedate.localeCompare(b.movedate); });
     const isCollapsed = !!collapsed[batch.id];
     const count = bDeals.length;
-    html += `<div class="batch-group" data-batch-id="${batch.id}"
-      ondragover="event.preventDefault();this.classList.add('batch-drop-target')"
-      ondragleave="if(!this.contains(event.relatedTarget))this.classList.remove('batch-drop-target')"
-      ondrop="event.stopPropagation();this.classList.remove('batch-drop-target');dropIntoBatch(event,${batch.id})">
+    html += `<div class="batch-group" data-batch-id="${batch.id}">
       <div class="batch-header" onclick="toggleBatch(${batch.id})" style="cursor:pointer;">
         <span style="font-size:10px;color:#818cf8;transition:transform .2s;display:inline-block;transform:${isCollapsed?'rotate(-90deg)':'rotate(0deg)'};margin-right:2px;">▼</span>
         <input class="batch-name" value="${batch.name.replace(/"/g,'&quot;')}"
@@ -1983,8 +1981,11 @@ function renderBatchedCards(stageDeals){
         <button onclick="event.stopPropagation();copyBatch(${batch.id},this)" style="background:none;border:1px solid rgba(99,102,241,.3);border-radius:3px;padding:1px 5px;font-size:10px;color:#818cf8;cursor:pointer;" title="Copy batch as quote request">📤</button>
         <button onclick="event.stopPropagation();if(confirm('Remove this batch? Deals will stay in the column.'))deleteBatch(${batch.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;" title="Delete batch">✕</button>
       </div>
-      <div class="batch-cards" id="batch-cards-${batch.id}" style="${isCollapsed?'display:none;':''}">
-        ${bDeals.length ? bDeals.map(d=>cardHTML(d)).join('') : '<div style="font-size:10px;color:var(--text3);padding:16px 6px;text-align:center;border:1px dashed rgba(99,102,241,.3);border-radius:4px;margin:2px;">Drop deals here</div>'}
+      <div class="batch-cards" id="batch-cards-${batch.id}" style="${isCollapsed?'display:none;':''}"
+        ondragover="event.preventDefault();event.stopPropagation();this.classList.add('batch-drop-target')"
+        ondragleave="if(!this.contains(event.relatedTarget))this.classList.remove('batch-drop-target')"
+        ondrop="event.preventDefault();event.stopPropagation();this.classList.remove('batch-drop-target');dropIntoBatch(event,${batch.id})">
+        ${bDeals.length ? bDeals.map(d=>cardHTML(d)).join('') : '<div style="font-size:10px;color:var(--text3);padding:22px 6px;text-align:center;border:1px dashed rgba(99,102,241,.3);border-radius:4px;margin:2px;pointer-events:none;">Drop deals here</div>'}
       </div>
     </div>`;
   });
@@ -7014,7 +7015,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 17;
+const DATA_VERSION = 18;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
