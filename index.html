@@ -104,8 +104,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .card.has-task-overdue:hover{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.3);}
 .card.has-task-today{border-color:rgba(249,115,22,.6);box-shadow:0 0 0 2px rgba(249,115,22,.2);}
 .card.has-task-today:hover{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,.3);}
-.card.has-task-upcoming{border-color:rgba(245,158,11,.5);box-shadow:0 0 0 2px rgba(245,158,11,.15);}
-.card.has-task-upcoming:hover{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(245,158,11,.25);}
+.card.has-task-upcoming{border-color:rgba(20,184,166,.5);box-shadow:0 0 0 2px rgba(20,184,166,.15);}
+.card.has-task-upcoming:hover{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,.25);}
 .card-company{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:2px;}
 .card-name{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:5px;padding-right:12px;line-height:1.3;}
 .card-meta{display:flex;flex-direction:column;gap:3px;}
@@ -2122,8 +2122,8 @@ function cardHTML(d){
     ${d.company?`<div class="card-company">${d.company}</div>`:''}
     <div class="card-name">${d.name}</div>
     <div class="card-meta">
-      ${d.transporter||d.volume
-        ? `<div class="card-row"><span class="icon">🚛</span>${[d.transporter, d.volume?formatVolume(d.volume):null].filter(Boolean).join(' · ')}</div>`
+      ${d.transporter||d.volume||d.dedicated
+        ? `<div class="card-row"><span class="icon">🚛</span>${[d.transporter, d.volume?formatVolume(d.volume):null, d.dedicated?'<span style="background:rgba(20,184,166,.15);color:#2dd4bf;border:1px solid rgba(20,184,166,.3);border-radius:3px;font-size:9.5px;padding:1px 5px;font-weight:700;letter-spacing:.3px;">DEDICATED</span>':null].filter(Boolean).join(' · ')}</div>`
         : ''}
       ${d.shuttle==='Yes'&&(d.shuttle_from_who||d.shuttle_to_who)?`<div class="card-row" style="color:var(--purple);font-size:10.5px;"><span class="icon">🚐</span>${[d.shuttle_from_who?(d.shuttle_from_who+(d.shuttle_from_note?' ('+d.shuttle_from_note+')':'')+' [FROM]'):'', d.shuttle_to_who?(d.shuttle_to_who+(d.shuttle_to_note?' ('+d.shuttle_to_note+')':'')+' [TO]'):''].filter(Boolean).join(' · ')}</div>`:''}
       ${d.movedate?`<div class="card-row"><span class="icon">📅</span>${fmtDate(d.movedate)}${d.movedate_end&&d.movedate_end!==d.movedate?' – '+fmtDate(d.movedate_end):''}${d.deliverydate&&d.deliverydate!==d.movedate?' → '+fmtDate(d.deliverydate):''}</div>`:''}
@@ -6118,7 +6118,7 @@ function renderPinnedBoard(){
         <div class="task-title">${t.note}</div>
         <div class="task-meta">
           <span style="color:var(--accent);">@${t.assignee}</span>
-          ${t.due?` · <span class="task-due${overdue?' style=\"color:#ef4444;font-weight:700;\"':dueToday?' style=\"color:#f97316;font-weight:700;\"':''}">${fmtDate(t.due)}</span>`:''}
+          ${t.due?` · <span class="task-due${overdue?' style=\"color:#ef4444;font-weight:700;\"':dueToday?' style=\"color:#f97316;font-weight:700;\"':' style=\"color:#14b8a6;\"'}">${fmtDate(t.due)}</span>`:''}
         </div>
       </div>
     </div>`;
@@ -6289,7 +6289,7 @@ function renderTasksView(){
             <div class="task-meta">
               <span style="color:var(--accent);">@${t.assignee}</span> ·
               <span style="color:var(--text3);">${t.sourceName}</span>
-              ${t.due?` · <span class="task-due" style="color:${groupType==='overdue'?'#ef4444':groupType==='today'?'#f97316':groupType==='upcoming'?'#f59e0b':'var(--text3)'};font-weight:${groupType==='overdue'||groupType==='today'?'700':'400'};">${fmtDate(t.due)}</span>`:''}
+              ${t.due?` · <span class="task-due" style="color:${groupType==='overdue'?'#ef4444':groupType==='today'?'#f97316':groupType==='upcoming'?'#14b8a6':'var(--text3)'};font-weight:${groupType==='overdue'||groupType==='today'?'700':'400'};">${fmtDate(t.due)}</span>`:''}
             </div>
           </div>
         </div>`).join('')}` : '';
@@ -6297,7 +6297,7 @@ function renderTasksView(){
     content.innerHTML =
       renderGroup(overdue,  '🔴 Overdue', '#ef4444', 'overdue') +
       renderGroup(today.filter(t=>!overdue.includes(t)), '📅 Due Today', '#f97316', 'today') +
-      renderGroup(upcoming.filter(t=>!overdue.includes(t)&&!today.includes(t)), '🟡 Upcoming', '#f59e0b', 'upcoming');
+      renderGroup(upcoming.filter(t=>!overdue.includes(t)&&!today.includes(t)), '🩵 Upcoming', '#14b8a6', 'upcoming');
 
   } else {
     // Mentions tab
@@ -6771,7 +6771,7 @@ function renderReports(){
       return `<tr onclick="openDeal(${d.id})" style="cursor:pointer;">
         <td>${d.quo||'—'}</td><td>${d.inv||'—'}</td>
         <td style="text-align:center;font-size:14px;">${d.payment==='Fully Paid'?'🟢':d.payment==='Deposit Paid'?'🟡':'🔴'}</td>
-        <td style="font-weight:600;color:${(d.tasks||[]).some(t=>!t.done)?'var(--red)':'var(--text)'};">${d.name}${(d.tasks||[]).some(t=>!t.done)?'<span style="font-size:9px;margin-left:4px;vertical-align:middle;">●</span>':''}</td>
+        <td style="font-weight:600;color:var(--text);">${d.name}${(d.tasks||[]).some(t=>!t.done)?'<span style="color:var(--red);font-size:9px;margin-left:5px;vertical-align:middle;" title="Has open tasks">●</span>':''}</td>
         <td>${d.transporter||'—'}</td>
         <td>${d.fromCity||d.from||'—'}</td><td>${d.toCity||d.to||'—'}</td>
         <td style="color:var(--text3);">${fmtDate(d.bookedDate)||fmtDate(d.movedate)||'—'}</td>
@@ -7015,7 +7015,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 18;
+const DATA_VERSION = 19;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
