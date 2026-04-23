@@ -1427,11 +1427,13 @@ const QUOTING = [
 ];
 
 const PRE = [
-  {id:'follow_up',label:'Followed Up',stripe:'#f59e0b'},
-  {id:'unreachable',label:'Unreachable',stripe:'#94a3b8'},
-  {id:'interested',label:'Interested',stripe:'#fb923c'},
-  {id:'waiting',label:'Waiting',stripe:'#f97316'},
-  {id:'on_hold',label:'On Hold',stripe:'#f43f5e'},
+  {id:'follow_up',  label:'Follow Up #1', stripe:'#f59e0b'},
+  {id:'follow_up_2',label:'Follow Up #2', stripe:'#fb923c'},
+  {id:'unreachable',label:'Unreachable',  stripe:'#94a3b8'},
+  {id:'interested', label:'Interested',   stripe:'#fb923c'},
+  {id:'waiting',    label:'Waiting',      stripe:'#f97316'},
+  {id:'on_hold',    label:'On Hold',      stripe:'#f43f5e'},
+  {id:'estimates',  label:'Estimates',    stripe:'#a78bfa'},
 ];
 
 const POST = [
@@ -1472,32 +1474,19 @@ async function pushRecord(record, attempt){
   var payload = JSON.parse(JSON.stringify(record));
   var encoded = encodeURIComponent(JSON.stringify(payload));
 
-  // Auto-trim only if POST body is genuinely oversized (Apps Script limit ~50KB)
-  // Use raw JSON length, NOT URL-encoded length — URL encoding inflates by 3x and
-  // caused premature truncation of perfectly valid quote text.
-  var bodySize = JSON.stringify(payload).length;
-
-  if(bodySize > 40000){
-    // First pass: trim partner quote text to 2000 chars each (was 150 — far too aggressive)
+  // Auto-trim if payload too large
+  if(encoded.length > 7000){
     if(payload.partnerQuotes) payload.partnerQuotes = payload.partnerQuotes.map(function(q){
-      return Object.assign({}, q, {quote:(q.quote||'').slice(0,2000), ourQuote:(q.ourQuote||'').slice(0,1000)});
+      return Object.assign({}, q, {quote:(q.quote||'').slice(0,150), ourQuote:(q.ourQuote||'').slice(0,100)});
     });
-    bodySize = JSON.stringify(payload).length;
+    encoded = encodeURIComponent(JSON.stringify(payload));
   }
-  if(bodySize > 40000){
-    // Second pass: trim old notes, keeping the last 10 at 500 chars each
-    if(payload.dealNotes) payload.dealNotes = (payload.dealNotes||[]).slice(-10).map(function(n){
-      return Object.assign({}, n, {text:(n.text||'').slice(0,500)});
+  if(encoded.length > 7000){
+    if(payload.dealNotes) payload.dealNotes = (payload.dealNotes||[]).slice(-3).map(function(n){
+      return Object.assign({}, n, {text:(n.text||'').slice(0,300)});
     });
-    bodySize = JSON.stringify(payload).length;
+    encoded = encodeURIComponent(JSON.stringify(payload));
   }
-  if(bodySize > 40000){
-    // Last resort: warn and refuse to save rather than silently corrupt data
-    console.error('[AFR] Payload still oversized after trim:', bodySize, 'bytes');
-    setSyncStatus('error','⚠️ Deal too large to save — please shorten notes or quotes');
-    return false;
-  }
-  encoded = encodeURIComponent(JSON.stringify(payload));
 
   try {
     const res = await fetch(SHEET_URL, {
@@ -2093,7 +2082,7 @@ function renderBoard(){
   updatePipeTotal();
   const dzPos = document.getElementById('dropZonePositive');
   if(dzPos){
-    dzPos.textContent = curPipeline==='quoting' ? '→ Followed Up (Pre-Booking)' : curPipeline==='pre' ? '→ Ready to Book (Booked)' : '✓ Drop here to mark Won';
+    dzPos.textContent = curPipeline==='quoting' ? '→ Follow Up #1 (Pre-Booking)' : curPipeline==='pre' ? '→ Ready to Book (Booked)' : '✓ Drop here to mark Won';
     dzPos.style.color = 'rgba(34,197,94,.6)';
   }
   // Restore column scroll positions
