@@ -1472,19 +1472,32 @@ async function pushRecord(record, attempt){
   var payload = JSON.parse(JSON.stringify(record));
   var encoded = encodeURIComponent(JSON.stringify(payload));
 
-  // Auto-trim if payload too large
-  if(encoded.length > 7000){
+  // Auto-trim only if POST body is genuinely oversized (Apps Script limit ~50KB)
+  // Use raw JSON length, NOT URL-encoded length — URL encoding inflates by 3x and
+  // caused premature truncation of perfectly valid quote text.
+  var bodySize = JSON.stringify(payload).length;
+
+  if(bodySize > 40000){
+    // First pass: trim partner quote text to 2000 chars each (was 150 — far too aggressive)
     if(payload.partnerQuotes) payload.partnerQuotes = payload.partnerQuotes.map(function(q){
-      return Object.assign({}, q, {quote:(q.quote||'').slice(0,150), ourQuote:(q.ourQuote||'').slice(0,100)});
+      return Object.assign({}, q, {quote:(q.quote||'').slice(0,2000), ourQuote:(q.ourQuote||'').slice(0,1000)});
     });
-    encoded = encodeURIComponent(JSON.stringify(payload));
+    bodySize = JSON.stringify(payload).length;
   }
-  if(encoded.length > 7000){
-    if(payload.dealNotes) payload.dealNotes = (payload.dealNotes||[]).slice(-3).map(function(n){
-      return Object.assign({}, n, {text:(n.text||'').slice(0,300)});
+  if(bodySize > 40000){
+    // Second pass: trim old notes, keeping the last 10 at 500 chars each
+    if(payload.dealNotes) payload.dealNotes = (payload.dealNotes||[]).slice(-10).map(function(n){
+      return Object.assign({}, n, {text:(n.text||'').slice(0,500)});
     });
-    encoded = encodeURIComponent(JSON.stringify(payload));
+    bodySize = JSON.stringify(payload).length;
   }
+  if(bodySize > 40000){
+    // Last resort: warn and refuse to save rather than silently corrupt data
+    console.error('[AFR] Payload still oversized after trim:', bodySize, 'bytes');
+    setSyncStatus('error','⚠️ Deal too large to save — please shorten notes or quotes');
+    return false;
+  }
+  encoded = encodeURIComponent(JSON.stringify(payload));
 
   try {
     const res = await fetch(SHEET_URL, {
@@ -7015,7 +7028,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 19;
+const DATA_VERSION = 20;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
