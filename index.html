@@ -1538,13 +1538,19 @@ async function pullAll(){
       if(id==='__reminders__') { newReminders=val.data; return; }
       if(val._type==='overhead'||id.startsWith('__overhead_')){ // Sync overhead lines across devices
         const key = id.replace('__overhead_','');
-        if(val.data && Array.isArray(val.data.lines)){
-          try { localStorage.setItem(key, JSON.stringify(val.data.lines)); } catch(e){}
-        } else if(val.data && Array.isArray(val.data)){
-          try { localStorage.setItem(key, JSON.stringify(val.data)); } catch(e){}
-        }
-        if(val.data && val.data.target!==undefined){
-          try { localStorage.setItem(key+'_target', val.data.target); } catch(e){}
+        const sheetTs = val._ts || 0;
+        const localTs = parseFloat(localStorage.getItem(key+'_ts')||'0')||0;
+        // Only overwrite local if sheet record is strictly newer
+        if(sheetTs > localTs){
+          if(val.data && Array.isArray(val.data.lines)){
+            try { localStorage.setItem(key, JSON.stringify(val.data.lines)); } catch(e){}
+          } else if(val.data && Array.isArray(val.data)){
+            try { localStorage.setItem(key, JSON.stringify(val.data)); } catch(e){}
+          }
+          if(val.data && val.data.target!==undefined){
+            try { localStorage.setItem(key+'_target', val.data.target); } catch(e){}
+          }
+          try { localStorage.setItem(key+'_ts', sheetTs); } catch(e){}
         }
         return;
       }
@@ -6475,9 +6481,12 @@ function populateTargetInput(){
 }
 
 function saveOverheadLines(lines){
-  try { localStorage.setItem(getOverheadKey(), JSON.stringify(lines)); } catch(e){}
-  // Push to Sheet so all devices share overhead data
-  pushRecord({id: '__overhead_'+getOverheadKey(), data: {lines, target: getMonthTarget()}, _type:'overhead'});
+  const ts = Date.now();
+  const key = getOverheadKey();
+  try { localStorage.setItem(key, JSON.stringify(lines)); } catch(e){}
+  try { localStorage.setItem(key+'_ts', ts); } catch(e){}
+  // Push to Sheet with _ts so other devices can resolve conflicts correctly
+  pushRecord({id: '__overhead_'+key, _ts: ts, data: {lines, target: getMonthTarget()}, _type:'overhead'});
 }
 
 function getMonthTarget(){
@@ -6485,10 +6494,12 @@ function getMonthTarget(){
 }
 
 function saveMonthTarget(val){
+  const ts = Date.now();
+  const key = getOverheadKey();
   const t = parseFloat(val)||0;
-  try { localStorage.setItem(getOverheadKey()+'_target', t); } catch(e){}
-  // Push to Sheet with current lines so target persists across devices
-  pushRecord({id: '__overhead_'+getOverheadKey(), data: {lines: getOverheadLines(), target: t}, _type:'overhead'});
+  try { localStorage.setItem(key+'_target', t); } catch(e){}
+  try { localStorage.setItem(key+'_ts', ts); } catch(e){}
+  pushRecord({id: '__overhead_'+key, _ts: ts, data: {lines: getOverheadLines(), target: t}, _type:'overhead'});
 }
 
 
@@ -6576,7 +6587,7 @@ function editOverheadLine(idx, field, value){
   const el = document.getElementById('ohTotal');
   if(el) el.textContent = zar(total);
   renderNetProfit();
-  // Do NOT call renderReports() here — it re-renders overhead inputs and kills the active edit
+  // Do NOT call renderReports() — it rebuilds overhead inputs and kills the active edit
 }
 
 function renderNetProfit(){
