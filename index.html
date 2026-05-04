@@ -6554,10 +6554,10 @@ function renderOverheadLines(){
   if(!wrap) return;
   wrap.innerHTML = lines.map((l,i)=>`
     <div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);">
-      <input value="${l.desc.replace(/"/g,'&quot;')}" onchange="editOverheadLine(${i},'desc',this.value)"
+      <input value="${l.desc.replace(/"/g,'&quot;')}" oninput="editOverheadLine(${i},'desc',this.value)"
         style="flex:1;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--text2);font-size:12px;font-family:'DM Sans',sans-serif;padding:2px 4px;outline:none;min-width:0;"
         onfocus="this.style.borderBottomColor='var(--accent)'" onblur="this.style.borderBottomColor='transparent'">
-      <input type="number" value="${l.amt}" onchange="editOverheadLine(${i},'amt',this.value)"
+      <input type="number" value="${l.amt}" oninput="editOverheadLine(${i},'amt',this.value)"
         style="width:90px;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;font-weight:600;padding:2px 4px;outline:none;text-align:right;"
         onfocus="this.style.borderBottomColor='var(--accent)'" onblur="this.style.borderBottomColor='transparent'">
       <span onclick="removeOverheadLine(${i})" style="cursor:pointer;color:var(--text3);font-size:14px;padding:0 4px;flex-shrink:0;">×</span>
@@ -6576,7 +6576,7 @@ function editOverheadLine(idx, field, value){
   const el = document.getElementById('ohTotal');
   if(el) el.textContent = zar(total);
   renderNetProfit();
-  renderReports();
+  // Do NOT call renderReports() here — it re-renders overhead inputs and kills the active edit
 }
 
 function renderNetProfit(){
@@ -7017,7 +7017,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 20;
+const DATA_VERSION = 21;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
