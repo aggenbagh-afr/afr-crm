@@ -5394,8 +5394,14 @@ function printCoverPage(){
   var contactLine = phones + (emails ? '  &nbsp;|&nbsp;  ' + emails : '');
   var bookedStr = d.bookedDate ? new Date(d.bookedDate).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}) : '—';
   var AL={good:'Good Access',maybe:'Query Access',steep:'Steep Access',dirt:'Dirt Road',stairs:'Stairs',lift:'Lift',hoisting:'Hoisting',shuttle:'Shuttle Required'};
-  var fromAccess=(d.fromAccess||[]).map(function(k){return AL[k]||k;}).join(', ')||'Good Access';
-  var toAccess=(d.toAccess||[]).map(function(k){return AL[k]||k;}).join(', ')||'Good Access';
+  var fromAccessArr=(d.fromAccess||[]).filter(function(k){return k!=='shuttle';}).map(function(k){return AL[k]||k;});
+  if(d.shuttle_from_who) fromAccessArr.unshift('🚐 Shuttle: '+d.shuttle_from_who+(d.shuttle_from_note?' ('+d.shuttle_from_note+')':''));
+  var fromAccess=fromAccessArr.join(', ')||(d.shuttle_from_who?'':'Good Access');
+  if(!fromAccess) fromAccess='Good Access';
+  var toAccessArr=(d.toAccess||[]).filter(function(k){return k!=='shuttle';}).map(function(k){return AL[k]||k;});
+  if(d.shuttle_to_who) toAccessArr.unshift('🚐 Shuttle: '+d.shuttle_to_who+(d.shuttle_to_note?' ('+d.shuttle_to_note+')':''));
+  var toAccess=toAccessArr.join(', ')||(d.shuttle_to_who?'':'Good Access');
+  if(!toAccess) toAccess='Good Access';
   var fromAC='#f5f5f5'; var fromAT='#111';
   var toAC='#f5f5f5'; var toAT='#111';
   var fmtD=function(s){if(!s)return '—';var p=s.split('-');if(p.length<3)return s;var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return parseInt(p[2])+' '+(mn[parseInt(p[1])-1]||p[1]);};
@@ -7028,7 +7034,7 @@ function resetAllDeals(){
 
 // ── DATA VERSION STAMP ───────────────────────────────────────────────────────
 // DATA_VERSION — bump only if hardcoded structure changes, never to force a Sheet push
-const DATA_VERSION = 21;
+const DATA_VERSION = 22;
 const storedVersion = parseInt(localStorage.getItem('afr_data_version')||'0');
 if(storedVersion < DATA_VERSION){
   // Just update the version number — never wipe localStorage or push seed data
